@@ -1,12 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 import HabitTracker from '@/components/HabitTracker';
 import TodayPanel from '@/components/TodayPanel';
+import { SystemRocket, StatusOnline, StatusCloud } from '@/components/ui/Icons';
 import { mockHabitsData, type Habit } from '@/lib/habitParser';
+import { saveToLocalStorage, loadFromLocalStorage } from '@/lib/utils';
 
 export default function Dashboard() {
-  const [habits, setHabits] = useState<Habit[]>(mockHabitsData.habits);
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  // Load habits from localStorage on mount
+  useEffect(() => {
+    setMounted(true);
+    const savedHabits = loadFromLocalStorage('lifeos-habits', mockHabitsData.habits);
+    setHabits(savedHabits);
+  }, []);
+
+  // Save habits to localStorage whenever habits change
+  useEffect(() => {
+    if (mounted && habits.length > 0) {
+      saveToLocalStorage('lifeos-habits', habits);
+    }
+  }, [habits, mounted]);
 
   const toggleHabit = (habitId: string) => {
     setHabits(prev => 
@@ -18,119 +37,158 @@ export default function Dashboard() {
     );
   };
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-command-background flex items-center justify-center">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-command-primary text-xl"
+        >
+          Initializing Command Center...
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-command-background text-command-text font-sans">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#1e1e3f',
+            color: '#e2e8f0',
+            border: '1px solid #374151',
+          }
+        }}
+      />
+
       {/* Header */}
-      <header className="border-b border-gray-800 p-6">
+      <motion.header 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="border-b border-command-border bg-command-surface/50 backdrop-blur-sm p-6"
+      >
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">
-                🛰️ LifeOS Command Center
-              </h1>
-              <p className="text-gray-400 mt-1">
-                Personal mission control • v0.1.0-mvp
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <div className="flex items-center gap-3 mb-1">
+                <SystemRocket className="text-command-primary animate-glow" size="lg" />
+                <h1 className="text-3xl font-bold text-command-text">
+                  LifeOS Command Center
+                </h1>
+              </div>
+              <p className="text-command-muted">
+                Personal mission control • v2.0.0-pro
               </p>
-            </div>
+            </motion.div>
             
             {/* Status Indicators */}
-            <div className="flex space-x-4">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex space-x-6"
+            >
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-gray-400">ONLINE</span>
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-2 h-2 bg-command-secondary rounded-full"
+                />
+                <StatusOnline className="text-command-secondary" size="sm" />
+                <span className="text-sm text-command-muted font-medium">ONLINE</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-gray-400">SYNC OK</span>
+                <div className="w-2 h-2 bg-command-primary rounded-full" />
+                <StatusCloud className="text-command-primary" size="sm" />
+                <span className="text-sm text-command-muted font-medium">SYNC OK</span>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Dashboard */}
       <main className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        >
           {/* Left Column - Main Habit Tracking */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <HabitTracker 
               habits={habits} 
               onToggleHabit={toggleHabit} 
             />
             
-            {/* Future: Project Status Panel */}
-            <div className="mt-6 bg-gray-900 border border-gray-700 rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-white mb-4">Active Projects</h2>
+            {/* Project Status Panel */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-command-surface/80 backdrop-blur-sm border border-command-border rounded-xl p-6 hover:bg-command-surface transition-all duration-300"
+            >
+              <h2 className="text-xl font-semibold text-command-text mb-4 flex items-center gap-2">
+                <SystemRocket size="md" className="text-command-accent" />
+                Active Projects
+              </h2>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-800 rounded">
+                <motion.div 
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className="flex items-center justify-between p-4 bg-command-background/50 rounded-lg border border-command-border/50 hover:border-command-primary/30 transition-all"
+                >
                   <div>
-                    <div className="text-white font-medium">LifeOS Dashboard MVP</div>
-                    <div className="text-sm text-gray-400">Building personal command center</div>
+                    <div className="text-command-text font-medium">LifeOS Dashboard Pro</div>
+                    <div className="text-sm text-command-muted">Professional command center implementation</div>
                   </div>
-                  <div className="text-green-400 font-bold">75%</div>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-800 rounded">
+                  <div className="text-command-secondary font-bold text-lg">95%</div>
+                </motion.div>
+                <motion.div 
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className="flex items-center justify-between p-4 bg-command-background/50 rounded-lg border border-command-border/50 hover:border-command-accent/30 transition-all"
+                >
                   <div>
-                    <div className="text-white font-medium">Morning Routine</div>
-                    <div className="text-sm text-gray-400">Establishing consistent habits</div>
+                    <div className="text-command-text font-medium">Morning Routine Optimization</div>
+                    <div className="text-sm text-command-muted">Habit tracking and analytics</div>
                   </div>
-                  <div className="text-yellow-400 font-bold">60%</div>
-                </div>
+                  <div className="text-command-accent font-bold text-lg">78%</div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right Column - Today Panel & Quick Actions */}
-          <div className="space-y-6">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="space-y-6"
+          >
             <TodayPanel />
-            
-            {/* Quick Actions */}
-            <div className="bg-gray-900 border border-gray-700 rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
-              <div className="space-y-3">
-                <button className="w-full p-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium transition-colors">
-                  📝 Add Quick Note
-                </button>
-                <button className="w-full p-3 bg-purple-600 hover:bg-purple-700 rounded text-white font-medium transition-colors">
-                  🎙️ Voice Memo
-                </button>
-                <button className="w-full p-3 bg-green-600 hover:bg-green-700 rounded text-white font-medium transition-colors">
-                  ✅ Mark All Complete
-                </button>
-                <button className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded text-white font-medium transition-colors">
-                  🧠 Three Brain View
-                </button>
-              </div>
-            </div>
-
-            {/* System Status */}
-            <div className="bg-gray-900 border border-gray-700 rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-white mb-4">System Status</h2>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Memory Usage</span>
-                  <span className="text-green-400">67%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Sync Status</span>
-                  <span className="text-green-400">Active</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Last Backup</span>
-                  <span className="text-gray-400">2 min ago</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 p-4">
-        <div className="max-w-7xl mx-auto text-center text-gray-500 text-sm">
-          LifeOS Command Center • Built with ⚡ and ☕ • {new Date().getFullYear()}
+      <motion.footer 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="border-t border-command-border bg-command-surface/30 backdrop-blur-sm p-4 mt-12"
+      >
+        <div className="max-w-7xl mx-auto text-center text-command-muted text-sm">
+          LifeOS Command Center • Powered by AI & Coffee • {new Date().getFullYear()}
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 }
