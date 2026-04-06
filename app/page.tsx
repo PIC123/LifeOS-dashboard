@@ -5,13 +5,17 @@ import { motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import HabitTracker from '@/components/HabitTracker';
 import TodayPanel from '@/components/TodayPanel';
+import ResponsiveLayout, { ResponsiveGrid } from '@/components/ui/ResponsiveLayout';
 import { SystemRocket, StatusOnline, StatusCloud } from '@/components/ui/Icons';
 import { mockHabitsData, type Habit } from '@/lib/habitParser';
 import { saveToLocalStorage, loadFromLocalStorage } from '@/lib/utils';
+import { useMobile, useSwipe } from '@/hooks/useMobile';
 
 export default function Dashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [currentView, setCurrentView] = useState<'main' | 'habits' | 'today'>('main');
+  const { isMobile } = useMobile();
 
   // Load habits from localStorage on mount
   useEffect(() => {
@@ -26,6 +30,20 @@ export default function Dashboard() {
       saveToLocalStorage('lifeos-habits', habits);
     }
   }, [habits, mounted]);
+
+  // Swipe gestures for mobile navigation
+  useSwipe(
+    () => {
+      // Swipe left - next view
+      if (currentView === 'main') setCurrentView('habits');
+      else if (currentView === 'habits') setCurrentView('today');
+    },
+    () => {
+      // Swipe right - previous view
+      if (currentView === 'today') setCurrentView('habits');
+      else if (currentView === 'habits') setCurrentView('main');
+    }
+  );
 
   const toggleHabit = (habitId: string) => {
     setHabits(prev => 
@@ -116,13 +134,9 @@ export default function Dashboard() {
       </motion.header>
 
       {/* Main Dashboard */}
-      <main className="max-w-7xl mx-auto p-6">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-        >
+      <main>
+        <ResponsiveLayout>
+          <ResponsiveGrid>
           {/* Left Column - Main Habit Tracking */}
           <div className="lg:col-span-2 space-y-6">
             <HabitTracker 
@@ -181,6 +195,23 @@ export default function Dashboard() {
             />
           </motion.div>
         </motion.div>
+
+        {/* Mobile Navigation Hint */}
+        {isMobile && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="flex justify-center mt-8"
+          >
+            <motion.div
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-command-surface/50 border border-command-border/50"
+            >
+              <div className="text-xs text-command-muted">👆 Swipe left/right to navigate</div>
+            </motion.div>
+          </motion.div>
+        )}
       </main>
 
       {/* Footer */}
