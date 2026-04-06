@@ -10,6 +10,7 @@ import { SystemRocket, StatusOnline, StatusCloud } from '@/components/ui/Icons';
 import { mockHabitsData, type Habit } from '@/lib/habitParser';
 import { saveToLocalStorage, loadFromLocalStorage } from '@/lib/utils';
 import { useMobile, useSwipe } from '@/hooks/useMobile';
+import { SciFiTitle, RotatedLabel, GlowingAccent } from '@/components/ui/PretextDisplay';
 
 export default function Dashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -75,59 +76,107 @@ export default function Dashboard() {
         position="top-right"
         toastOptions={{
           style: {
-            background: '#1e1e3f',
-            color: '#e2e8f0',
-            border: '1px solid #374151',
+            background: '#2a2a2a',
+            color: '#ffffff',
+            border: '1px solid #3a3a3a',
+            borderRadius: '0.25rem',
+            fontSize: '0.875rem',
+            fontFamily: 'mono',
           }
         }}
       />
 
-      {/* Header */}
+      {/* Minimalist Sci-Fi Header */}
       <motion.header 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="border-b border-command-border bg-command-surface/50 backdrop-blur-sm p-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className="border-b border-command-border/20 bg-command-background/95 backdrop-blur-xl sticky top-0 z-50"
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
+            {/* Creative Logo Section */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.05 }}
+              className="flex items-center gap-8"
             >
-              <div className="flex items-center gap-3 mb-1">
-                <SystemRocket className="text-command-primary animate-glow" size="lg" />
-                <h1 className="text-3xl font-bold text-command-text">
-                  LifeOS Command Center
-                </h1>
+              {/* Vertical Text */}
+              <div className="flex items-center gap-3">
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-1 h-8 bg-command-primary/80 rounded-full animate-glow-blue"></div>
+                  <div className="w-1 h-6 bg-command-accent/80 rounded-full animate-glow-orange"></div>
+                  <div className="w-1 h-4 bg-command-text/60 rounded-full animate-pulse"></div>
+                </div>
+                <RotatedLabel angle="rotate--90" glow="primary" delay={0.05}>
+                  SYS
+                </RotatedLabel>
               </div>
-              <p className="text-command-muted">
-                Personal mission control • v2.0.0-pro
-              </p>
+
+              {/* Main Title - Ultra Thin & Tall with Pretext */}
+              <div className="flex flex-col">
+                <SciFiTitle className="text-lg text-command-text uppercase leading-none" delay={0.1}>
+                  LIFEOS
+                </SciFiTitle>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="w-8 h-px bg-command-primary/40"></div>
+                  <GlowingAccent color="accent" className="text-xs uppercase" delay={0.15}>
+                    COMMAND
+                  </GlowingAccent>
+                </div>
+              </div>
             </motion.div>
             
-            {/* Status Indicators */}
+            {/* Rotated Status Panel */}
             <motion.div 
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex space-x-6"
+              transition={{ delay: 0.1 }}
+              className="flex items-center gap-8"
             >
-              <div className="flex items-center space-x-2">
-                <motion.div 
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-2 h-2 bg-command-secondary rounded-full"
-                />
-                <StatusOnline className="text-command-secondary" size="sm" />
-                <span className="text-sm text-command-muted font-medium">ONLINE</span>
+              {/* Status Grid with Pretext */}
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-1">
+                    <div className="w-1 h-1 bg-command-primary rounded-full animate-pulse" />
+                    <RotatedLabel angle="normal" className="text-command-muted text-xs" delay={0.2}>
+                      SYS
+                    </RotatedLabel>
+                  </div>
+                  <GlowingAccent color="primary" className="text-xs" delay={0.25}>
+                    ONLINE
+                  </GlowingAccent>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-1">
+                    <div className="w-1 h-1 bg-command-accent rounded-full animate-pulse" />
+                    <RotatedLabel angle="normal" className="text-command-muted text-xs" delay={0.3}>
+                      NET
+                    </RotatedLabel>
+                  </div>
+                  <GlowingAccent color="accent" className="text-xs" delay={0.35}>
+                    SYNC
+                  </GlowingAccent>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-command-primary rounded-full" />
-                <StatusCloud className="text-command-primary" size="sm" />
-                <span className="text-sm text-command-muted font-medium">SYNC OK</span>
-              </div>
+
+              {/* Vertical Separator */}
+              <div className="h-8 w-px bg-command-border/30"></div>
+
+              {/* Rotated Time with Pretext */}
+              <SciFiTitle 
+                orientation="rotate-12" 
+                glow="primary" 
+                className="text-sm" 
+                delay={0.4}
+              >
+                {new Date().toLocaleTimeString('en-US', { 
+                  hour12: false, 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </SciFiTitle>
             </motion.div>
           </div>
         </div>
@@ -137,8 +186,8 @@ export default function Dashboard() {
       <main>
         <ResponsiveLayout>
           <ResponsiveGrid>
-          {/* Left Column - Main Habit Tracking */}
-          <div className="lg:col-span-2 space-y-6">
+            {/* Left Column - Main Habit Tracking */}
+            <div className="lg:col-span-2 space-y-6">
             <HabitTracker 
               habits={habits} 
               onToggleHabit={toggleHabit} 
@@ -194,7 +243,8 @@ export default function Dashboard() {
               }}
             />
           </motion.div>
-        </motion.div>
+          </ResponsiveGrid>
+        </ResponsiveLayout>
 
         {/* Mobile Navigation Hint */}
         {isMobile && (

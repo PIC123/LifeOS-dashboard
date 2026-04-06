@@ -5,13 +5,10 @@ import toast from 'react-hot-toast';
 import { Habit } from '@/lib/habitParser';
 import { 
   ActionCompleteSolid, 
-  ActionComplete, 
-  AchievementStreak, 
-  AchievementTrophy, 
-  EffectSparkles,
-  TimeDay
+  ActionComplete
 } from '@/components/ui/Icons';
 import { celebrateCompletion, cn } from '@/lib/utils';
+import { SciFiTitle, RotatedLabel, GlowingAccent } from '@/components/ui/PretextDisplay';
 
 interface HabitTrackerProps {
   habits: Habit[];
@@ -21,14 +18,13 @@ interface HabitTrackerProps {
 export default function HabitTracker({ habits, onToggleHabit }: HabitTrackerProps) {
   const completedCount = habits.filter(h => h.completed).length;
   const completionPercentage = habits.length > 0 ? (completedCount / habits.length) * 100 : 0;
-  const isFullyComplete = completionPercentage === 100;
 
   const handleToggleHabit = (habitId: string) => {
     const habit = habits.find(h => h.id === habitId);
     if (habit && !habit.completed) {
       celebrateCompletion();
-      toast.success(`${habit.name} completed! 🎉`, {
-        duration: 2000,
+      toast.success(`${habit.name} ✓`, {
+        duration: 1500,
       });
     }
     onToggleHabit(habitId);
@@ -36,205 +32,176 @@ export default function HabitTracker({ habits, onToggleHabit }: HabitTrackerProp
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className={cn(
-        "bg-command-surface/80 backdrop-blur-sm border border-command-border rounded-xl p-6 transition-all duration-300",
-        isFullyComplete && "animate-glow"
-      )}
+      transition={{ duration: 0.2 }}
+      className="bg-command-surface/30 border border-command-border/40 rounded-lg overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <TimeDay className="text-command-secondary animate-pulse" />
-          <h2 className="text-xl font-semibold text-command-text">Morning Routine</h2>
-        </div>
-        <div className="text-right">
-          <motion.div 
-            key={completedCount}
-            initial={{ scale: 1.2 }}
-            animate={{ scale: 1 }}
-            className="text-2xl font-bold text-command-secondary"
-          >
-            {completedCount}/{habits.length}
-          </motion.div>
-          <div className="text-sm text-command-muted">
-            {completionPercentage.toFixed(0)}% Complete
+      {/* Creative Header with Unique Text Orientation */}
+      <div className="px-6 py-4 border-b border-command-border/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            {/* Vertical Progress Indicator with Pretext */}
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-1 h-6 bg-command-primary/60 rounded-full animate-glow-blue"></div>
+              <RotatedLabel angle="rotate--90" glow="primary" className="text-xs" delay={0.05}>
+                RUN
+              </RotatedLabel>
+            </div>
+            
+            {/* Ultra-thin Title with Pretext */}
+            <div className="flex flex-col">
+              <SciFiTitle className="text-base text-command-text uppercase leading-none" delay={0.1}>
+                ROUTINE
+              </SciFiTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="w-12 h-px bg-command-accent/40"></div>
+                <GlowingAccent color="accent" className="text-xs uppercase" delay={0.15}>
+                  EXEC
+                </GlowingAccent>
+              </div>
+            </div>
+          </div>
+          
+          {/* Rotated Counter with Pretext */}
+          <div className="text-center">
+            <SciFiTitle 
+              orientation="rotate-6" 
+              glow="primary" 
+              className="text-lg" 
+              delay={0.2}
+            >
+              {completedCount.toString()}
+            </SciFiTitle>
+            <div className="w-4 h-px bg-command-primary/40 mx-auto"></div>
+            <GlowingAccent 
+              color="primary" 
+              orientation="rotate-3" 
+              className="text-xs opacity-60" 
+              delay={0.25}
+            >
+              {habits.length.toString()}
+            </GlowingAccent>
           </div>
         </div>
       </div>
 
-      {/* Progress Ring */}
-      <div className="flex justify-center mb-6">
-        <motion.div 
-          className="relative w-28 h-28"
-          whileHover={{ scale: 1.05 }}
-        >
-          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-            {/* Background ring */}
-            <circle
-              cx="50"
-              cy="50"
-              r="45"
-              stroke="#374151"
-              strokeWidth="6"
-              fill="none"
-              className="opacity-30"
-            />
-            {/* Progress ring */}
-            <motion.circle
-              cx="50"
-              cy="50"
-              r="45"
-              stroke="url(#gradient)"
-              strokeWidth="6"
-              fill="none"
-              strokeLinecap="round"
-              strokeDasharray={282.7}
-              strokeDashoffset={282.7 - (completionPercentage * 2.827)}
-              className="transition-all duration-700 ease-out"
-            />
-            {/* Gradient definition */}
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#10b981" />
-                <stop offset="100%" stopColor="#6366f1" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.span
-              key={completionPercentage}
-              initial={{ scale: 1.3, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="text-xl font-bold text-command-secondary"
-            >
-              {completionPercentage.toFixed(0)}%
-            </motion.span>
-          </div>
-          {isFullyComplete && (
+      {/* Progress Bar */}
+      <div className="px-6 py-2 bg-command-background/20">
+        <div className="relative h-1 bg-command-background/50 rounded-full overflow-hidden">
+          <motion.div
+            className="absolute top-0 left-0 h-full bg-gradient-to-r from-command-primary to-command-accent"
+            initial={{ width: 0 }}
+            animate={{ width: `${completionPercentage}%` }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          />
+          {completionPercentage === 100 && (
             <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="absolute -top-2 -right-2"
-            >
-              <EffectSparkles className="text-command-accent animate-pulse" size="lg" />
-            </motion.div>
+              className="absolute inset-0 bg-command-primary/20 animate-glow-blue"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            />
           )}
-        </motion.div>
+        </div>
       </div>
 
       {/* Habit List */}
-      <div className="space-y-3">
-        <AnimatePresence>
+      <div className="px-6 py-4">
+        <div className="space-y-2">
           {habits.map((habit, index) => (
             <motion.div
               key={habit.id}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.05, duration: 0.2 }}
               className={cn(
-                "flex items-center space-x-4 p-4 rounded-xl transition-all duration-200 cursor-pointer group border",
+                "group flex items-center justify-between p-3 rounded-md transition-all duration-200 cursor-pointer",
+                "hover:bg-command-surface/30 border border-transparent",
                 habit.completed 
-                  ? "bg-command-secondary/10 border-command-secondary/30 hover:bg-command-secondary/15" 
-                  : "bg-command-background/50 border-command-border/50 hover:border-command-primary/30 hover:bg-command-surface/30"
+                  ? "bg-command-primary/5 border-command-primary/20" 
+                  : "hover:border-command-border/40"
               )}
               onClick={() => handleToggleHabit(habit.id)}
-              whileHover={{ scale: 1.02, x: 5 }}
-              whileTap={{ scale: 0.98 }}
             >
-              {/* Checkbox */}
-              <motion.div 
-                className={cn(
-                  "w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all duration-200",
-                  habit.completed 
-                    ? 'bg-command-secondary border-command-secondary shadow-lg' 
-                    : 'border-command-border group-hover:border-command-primary'
-                )}
-                whileTap={{ scale: 0.9 }}
-              >
-                {habit.completed ? (
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', stiffness: 200 }}
-                  >
-                    <ActionCompleteSolid className="text-white" size="md" />
-                  </motion.div>
-                ) : (
-                  <ActionComplete className="text-command-muted group-hover:text-command-primary opacity-0 group-hover:opacity-100 transition-opacity" size="sm" />
-                )}
-              </motion.div>
+              <div className="flex items-center gap-3 flex-1">
+                {/* Checkbox */}
+                <motion.div
+                  className={cn(
+                    "relative w-4 h-4 border rounded-sm transition-all duration-200 flex items-center justify-center",
+                    habit.completed
+                      ? "bg-command-primary border-command-primary"
+                      : "border-command-border group-hover:border-command-primary/50"
+                  )}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <AnimatePresence>
+                    {habit.completed && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        <ActionCompleteSolid className="w-3 h-3 text-command-background" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
 
-              {/* Habit Details */}
-              <div className="flex-1">
-                <div className={cn(
-                  "font-medium text-lg transition-all duration-200",
+                {/* Ultra-thin Habit Name */}
+                <span className={cn(
+                  "font-ultra font-thin text-sm transition-all duration-200 tracking-wide",
                   habit.completed 
-                    ? 'text-command-secondary' 
-                    : 'text-command-text group-hover:text-command-primary'
+                    ? "text-command-text line-through opacity-70" 
+                    : "text-command-text group-hover:text-command-primary"
                 )}>
                   {habit.name}
-                </div>
-                <div className="text-sm text-command-muted">
-                  Target: {habit.target}
-                </div>
-                {habit.description && (
-                  <div className="text-xs text-command-muted/80 mt-1">
-                    {habit.description}
-                  </div>
-                )}
+                </span>
               </div>
 
               {/* Status Indicator */}
-              <motion.div 
-                className={cn(
-                  "w-3 h-3 rounded-full transition-all duration-200",
-                  habit.completed ? 'bg-command-secondary animate-pulse' : 'bg-command-muted/50'
-                )}
-                animate={{ scale: habit.completed ? [1, 1.2, 1] : 1 }}
-                transition={{ duration: 0.5, repeat: habit.completed ? 1 : 0 }}
-              />
+              {habit.completed && (
+                <motion.div
+                  className="flex items-center gap-1"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <div className="w-1 h-1 bg-command-primary rounded-full animate-pulse"></div>
+                </motion.div>
+              )}
             </motion.div>
           ))}
-        </AnimatePresence>
+        </div>
       </div>
 
-      {/* Quick Stats */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="mt-6 pt-4 border-t border-command-border"
-      >
-        <div className="grid grid-cols-3 gap-6 text-center">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="p-3 rounded-lg bg-command-primary/10 border border-command-primary/20"
-          >
-            <AchievementStreak className="mx-auto mb-2 text-command-primary" size="lg" />
-            <div className="text-lg font-bold text-command-primary">7</div>
-            <div className="text-xs text-command-muted">Day Streak</div>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="p-3 rounded-lg bg-command-accent/10 border border-command-accent/20"
-          >
-            <AchievementTrophy className="mx-auto mb-2 text-command-accent" size="lg" />
-            <div className="text-lg font-bold text-command-accent">21</div>
-            <div className="text-xs text-command-muted">Best Streak</div>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="p-3 rounded-lg bg-command-secondary/10 border border-command-secondary/20"
-          >
-            <EffectSparkles className="mx-auto mb-2 text-command-secondary" size="lg" />
-            <div className="text-lg font-bold text-command-secondary">85%</div>
-            <div className="text-xs text-command-muted">Weekly Rate</div>
-          </motion.div>
-        </div>
-      </motion.div>
+      {/* Ultra-thin Completion Status */}
+      {completionPercentage === 100 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="px-6 py-3 bg-command-primary/5 border-t border-command-primary/20"
+        >
+          <div className="flex items-center gap-4">
+            <div className="transform rotate-45">
+              <div className="w-2 h-2 bg-command-accent rounded-full animate-glow-orange"></div>
+            </div>
+            <div className="flex flex-col">
+              <GlowingAccent 
+                color="accent" 
+                className="text-sm uppercase leading-none" 
+                delay={0.3}
+              >
+                **COMPLETE**
+              </GlowingAccent>
+              <div className="w-16 h-px bg-command-accent/40 mt-1"></div>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

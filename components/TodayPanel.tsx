@@ -2,22 +2,17 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import LiveClock from '@/components/ui/LiveClock';
 import QuickNoteModal from '@/components/modals/QuickNoteModal';
 import VoiceMemoModal from '@/components/modals/VoiceMemoModal';
 import MarkAllCompleteModal from '@/components/modals/MarkAllCompleteModal';
 import { 
-  SystemTerminal, 
-  TimeDay, 
-  EffectSparkles, 
-  DataCalendar,
   ActionNote,
   ActionVoice,
-  ActionComplete,
-  EffectBrain
+  ActionComplete
 } from '@/components/ui/Icons';
 import { useKeyboardShortcuts, quickActionShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Habit } from '@/lib/habitParser';
+import { SciFiTitle, RotatedLabel, GlowingAccent } from '@/components/ui/PretextDisplay';
 
 interface TodayPanelProps {
   habits?: Habit[];
@@ -28,7 +23,6 @@ export default function TodayPanel({ habits = [], onMarkAllComplete }: TodayPane
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [showVoiceModal, setShowVoiceModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const [showBrainView, setShowBrainView] = useState(false);
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -43,195 +37,198 @@ export default function TodayPanel({ habits = [], onMarkAllComplete }: TodayPane
     {
       ...quickActionShortcuts.complete,
       callback: () => setShowCompleteModal(true)
-    },
-    {
-      ...quickActionShortcuts.brain,
-      callback: () => setShowBrainView(true)
     }
   ]);
 
+  const completedCount = habits.filter(h => h.completed).length;
+  const totalHabits = habits.length;
+  const completionPercentage = totalHabits > 0 ? (completedCount / totalHabits) * 100 : 0;
+
+  const quickActions = [
+    {
+      id: 'note',
+      label: 'NOTE',
+      shortcut: '⌘N',
+      icon: ActionNote,
+      onClick: () => setShowNoteModal(true),
+      color: 'command-primary'
+    },
+    {
+      id: 'voice',
+      label: 'VOICE',
+      shortcut: '⌘V',
+      icon: ActionVoice,
+      onClick: () => setShowVoiceModal(true),
+      color: 'command-accent'
+    },
+    {
+      id: 'complete',
+      label: 'EXEC',
+      shortcut: '⌘E',
+      icon: ActionComplete,
+      onClick: () => setShowCompleteModal(true),
+      color: 'command-secondary'
+    }
+  ];
+
   return (
     <>
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="bg-command-surface/80 backdrop-blur-sm border border-command-border rounded-xl p-6 hover:bg-command-surface transition-all duration-300"
+        transition={{ duration: 0.2, delay: 0.1 }}
+        className="bg-command-surface/20 border border-command-border/30 rounded-lg overflow-hidden"
       >
-        <div className="flex items-center gap-2 mb-6">
-          <SystemTerminal className="text-command-primary animate-glow" />
-          <h2 className="text-xl font-semibold text-command-text">Mission Control</h2>
-        </div>
-        
-        {/* Live Clock */}
-        <LiveClock className="mb-6" />
-
-        {/* Today's Focus */}
-        <div className="space-y-4 mb-6">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="border-l-4 border-command-primary pl-4 bg-command-primary/5 rounded-r-lg py-2"
-          >
-            <h3 className="text-command-text font-medium flex items-center gap-2">
-              <EffectSparkles size="sm" className="text-command-primary" />
-              Primary Objective
-            </h3>
-            <p className="text-command-muted text-sm mt-1">
-              Complete dashboard pro enhancement mission
-            </p>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="border-l-4 border-command-accent pl-4 bg-command-accent/5 rounded-r-lg py-2"
-          >
-            <h3 className="text-command-text font-medium flex items-center gap-2">
-              <SystemTerminal size="sm" className="text-command-accent" />
-              Secondary Mission
-            </h3>
-            <p className="text-command-muted text-sm mt-1">
-              Implement all 23 roadmap features
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Quick Actions */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mb-6"
-        >
-          <h3 className="text-command-text font-medium mb-3 flex items-center gap-2">
-            <EffectSparkles size="sm" className="text-command-secondary" />
-            Quick Actions
-            <span className="text-xs text-command-muted font-normal ml-2">
-              (⌘ shortcuts)
-            </span>
-          </h3>
-          <div className="grid grid-cols-2 gap-2">
-            <motion.button 
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowNoteModal(true)}
-              className="p-3 bg-command-primary/20 hover:bg-command-primary/30 rounded-lg text-command-primary font-medium transition-all duration-200 flex items-center gap-2 text-sm border border-command-primary/20"
-              title="Quick Note (⌘N)"
-            >
-              <ActionNote size="sm" />
-              Note
-            </motion.button>
-            <motion.button 
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowVoiceModal(true)}
-              className="p-3 bg-command-accent/20 hover:bg-command-accent/30 rounded-lg text-command-accent font-medium transition-all duration-200 flex items-center gap-2 text-sm border border-command-accent/20"
-              title="Voice Memo (⌘M)"
-            >
-              <ActionVoice size="sm" />
-              Voice
-            </motion.button>
-            <motion.button 
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowCompleteModal(true)}
-              className="p-3 bg-command-secondary/20 hover:bg-command-secondary/30 rounded-lg text-command-secondary font-medium transition-all duration-200 flex items-center gap-2 text-sm border border-command-secondary/20"
-              title="Mark All Complete (⌘K)"
-            >
-              <ActionComplete size="sm" />
-              Complete
-            </motion.button>
-            <motion.button 
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowBrainView(!showBrainView)}
-              className={`p-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 text-sm border ${
-                showBrainView 
-                  ? 'bg-command-muted/30 border-command-muted/40 text-command-text' 
-                  : 'bg-command-muted/20 hover:bg-command-muted/30 border-command-muted/20 text-command-muted'
-              }`}
-              title="Three Brain View (⌘B)"
-            >
-              <EffectBrain size="sm" />
-              Brain
-            </motion.button>
-          </div>
-        </motion.div>
-
-        {/* Brain View Toggle */}
-        {showBrainView && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-6 p-3 bg-command-background/50 border border-command-border/50 rounded-lg"
-          >
-            <div className="text-xs text-command-muted mb-2">Three Brain System:</div>
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <div className="text-center p-2 bg-command-primary/10 rounded text-command-primary">
-                <div className="font-medium">Reptilian</div>
-                <div className="opacity-70">Survival</div>
+        {/* Creative Status Header */}
+        <div className="px-6 py-4 border-b border-command-border/20">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-6">
+              {/* Vertical Status Line with Pretext */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-1 h-4 bg-command-accent/80 rounded-full animate-glow-orange"></div>
+                <RotatedLabel angle="rotate--90" glow="accent" className="text-xs" delay={0.05}>
+                  NOW
+                </RotatedLabel>
               </div>
-              <div className="text-center p-2 bg-command-accent/10 rounded text-command-accent">
-                <div className="font-medium">Limbic</div>
-                <div className="opacity-70">Emotion</div>
-              </div>
-              <div className="text-center p-2 bg-command-secondary/10 rounded text-command-secondary">
-                <div className="font-medium">Neocortex</div>
-                <div className="opacity-70">Logic</div>
+              
+              {/* Ultra-thin Header with Pretext */}
+              <div className="flex flex-col">
+                <SciFiTitle className="text-base text-command-text uppercase leading-none" delay={0.1}>
+                  STATUS
+                </SciFiTitle>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="w-10 h-px bg-command-primary/40"></div>
+                  <GlowingAccent color="primary" className="text-xs uppercase" delay={0.15}>
+                    TODAY
+                  </GlowingAccent>
+                </div>
               </div>
             </div>
-          </motion.div>
-        )}
-
-        {/* Energy & Status */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="pt-4 border-t border-command-border"
-        >
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="text-center">
-              <TimeDay className="text-command-secondary mx-auto mb-1" size="lg" />
-              <div className="text-xs text-command-muted">Day Mode</div>
-            </div>
-            <div className="text-center">
-              <EffectSparkles className="text-command-primary mx-auto mb-1" size="lg" />
-              <div className="text-xs text-command-muted">High Focus</div>
-            </div>
+            
+            {/* Rotated Date with Pretext */}
+            <SciFiTitle 
+              orientation="rotate--6" 
+              glow="primary" 
+              className="text-sm" 
+              delay={0.2}
+            >
+              {new Date().toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: '2-digit' 
+              }).replace(' ', '.').toUpperCase()}
+            </SciFiTitle>
           </div>
 
-          {/* Weather & Calendar */}
+          {/* Progress Summary */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-2 bg-command-background/50 rounded border border-command-border/50">
-              <span className="text-command-text text-sm flex items-center gap-2">
-                <DataCalendar size="sm" className="text-command-muted" />
-                NYC Weather
-              </span>
-              <span className="text-command-muted text-sm">72°F ⛅</span>
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-command-muted">COMPLETION</span>
+              <span className="text-command-text">{Math.round(completionPercentage)}%</span>
+            </div>
+            <div className="relative h-1 bg-command-background/50 rounded-full overflow-hidden">
+              <motion.div
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-command-primary via-command-accent to-command-secondary"
+                initial={{ width: 0 }}
+                animate={{ width: `${completionPercentage}%` }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              />
             </div>
           </div>
-        </motion.div>
+        </div>
+
+        {/* Ultra-thin Quick Actions */}
+        <div className="px-6 py-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="transform rotate-45">
+                <div className="w-1 h-1 bg-command-primary rounded-full"></div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-px bg-command-primary/30"></div>
+                <RotatedLabel angle="normal" className="text-xs text-command-muted" delay={0.25}>
+                  ACTIONS
+                </RotatedLabel>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              {quickActions.map((action, index) => (
+                <motion.button
+                  key={action.id}
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.2 }}
+                  onClick={action.onClick}
+                  className="group w-full flex items-center justify-between py-3 px-3 rounded-md border border-transparent transition-all duration-200 hover:border-command-border/40 hover:bg-command-surface/20"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-4 h-4 flex items-center justify-center text-${action.color} group-hover:animate-pulse transform group-hover:rotate-12 transition-transform`}>
+                      <action.icon className="w-3 h-3" />
+                    </div>
+                    <SciFiTitle className="text-sm text-command-text uppercase" delay={index * 0.1 + 0.3}>
+                      {action.label}
+                    </SciFiTitle>
+                  </div>
+                  <GlowingAccent 
+                    color="primary" 
+                    orientation="rotate--6" 
+                    className="text-xs opacity-0 group-hover:opacity-100 transition-all" 
+                    delay={index * 0.05 + 0.4}
+                  >
+                    {action.shortcut}
+                  </GlowingAccent>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Ultra-thin System Info */}
+        <div className="px-6 py-3 bg-command-background/20 border-t border-command-border/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="transform rotate-45">
+                <div className="w-1 h-1 bg-command-primary rounded-full animate-pulse"></div>
+              </div>
+              <GlowingAccent color="primary" className="text-xs text-command-muted uppercase" delay={0.5}>
+                SYS.READY
+              </GlowingAccent>
+            </div>
+            <SciFiTitle 
+              orientation="rotate-3" 
+              glow="primary" 
+              className="text-xs" 
+              delay={0.55}
+            >
+              {new Date().toLocaleTimeString('en-US', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </SciFiTitle>
+          </div>
+        </div>
       </motion.div>
 
       {/* Modals */}
       <QuickNoteModal 
-        isOpen={showNoteModal} 
-        onClose={() => setShowNoteModal(false)} 
+        isOpen={showNoteModal}
+        onClose={() => setShowNoteModal(false)}
       />
+      
       <VoiceMemoModal 
-        isOpen={showVoiceModal} 
-        onClose={() => setShowVoiceModal(false)} 
+        isOpen={showVoiceModal}
+        onClose={() => setShowVoiceModal(false)}
       />
+      
       <MarkAllCompleteModal 
-        isOpen={showCompleteModal} 
+        isOpen={showCompleteModal}
         onClose={() => setShowCompleteModal(false)}
         habits={habits}
-        onMarkAllComplete={onMarkAllComplete || (() => {})}
+        onMarkAllComplete={() => {
+          onMarkAllComplete?.();
+          setShowCompleteModal(false);
+        }}
       />
     </>
   );

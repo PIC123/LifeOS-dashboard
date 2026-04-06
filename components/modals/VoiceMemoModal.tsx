@@ -25,11 +25,11 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         setIsSupported(true);
         recognitionRef.current = new SpeechRecognition();
@@ -44,7 +44,7 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
           setStartTime(Date.now());
         };
 
-        recognition.onresult = (event) => {
+        recognition.onresult = (event: any) => {
           let interimTranscript = '';
           let finalTranscript = '';
 
@@ -60,7 +60,7 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
           setTranscript(prev => prev + finalTranscript + interimTranscript);
         };
 
-        recognition.onerror = (event) => {
+        recognition.onerror = (event: any) => {
           console.error('Speech recognition error:', event.error);
           toast.error('Voice recognition error. Please try again.');
           setIsRecording(false);
@@ -187,6 +187,7 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              // @ts-ignore - Framer Motion transition typing issue
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               className="w-full max-w-md bg-command-surface border border-command-border rounded-xl p-6 shadow-2xl"
             >

@@ -85,6 +85,7 @@ export default function CelebrationEffect({
             <motion.div
               key={particle.id}
               custom={particle}
+              // @ts-ignore - Complex Framer Motion variants typing issue  
               variants={particleVariants}
               initial="initial"
               animate="animate"

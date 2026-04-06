@@ -10,32 +10,62 @@ module.exports = {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
-        // Command Center Professional Palette
+        // Sci-Fi Minimalist Palette
         command: {
-          primary: '#6366f1',      // Indigo - professional tech blue
-          secondary: '#10b981',    // Emerald - success states
-          accent: '#f59e0b',       // Amber - warnings/highlights
-          background: '#0f0f23',   // Deep space blue, not pure black
-          surface: '#1e1e3f',      // Elevated surfaces
-          text: '#e2e8f0',         // Soft white, not harsh #fff
-          muted: '#64748b',        // Secondary text
-          border: '#374151',       // Subtle borders
+          primary: '#60a5fa',      // Glowing light blue
+          secondary: '#fb7185',    // Glowing coral/pink
+          accent: '#f97316',       // Bright orange
+          background: '#1a1a1a',   // Dark gray background
+          surface: '#2a2a2a',      // Slightly lighter gray for surfaces
+          text: '#ffffff',         // Pure glowing white
+          muted: '#888888',        // Muted gray
+          border: '#3a3a3a',       // Subtle gray borders
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'monospace'],
+        ultra: ['JetBrains Mono', 'SF Mono', 'monospace'],
+      },
+      fontWeight: {
+        'ultra-thin': '100',
+        'extra-thin': '200',
+        'thin': '300',
+      },
+      letterSpacing: {
+        'ultra-wide': '0.2em',
+        'mega-wide': '0.3em',
+        'super-wide': '0.4em',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'glow': 'glow 2s ease-in-out infinite alternate',
+        'glow-blue': 'glowBlue 2s ease-in-out infinite alternate',
+        'glow-orange': 'glowOrange 2s ease-in-out infinite alternate',
         'fade-in': 'fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         'slide-up': 'slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        'scan': 'scan 3s linear infinite',
+        'float': 'float 4s ease-in-out infinite',
       },
       keyframes: {
-        glow: {
-          '0%': { boxShadow: '0 0 5px rgba(99, 102, 241, 0.5)' },
-          '100%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.4)' }
+        glowBlue: {
+          '0%': { 
+            boxShadow: '0 0 5px rgba(96, 165, 250, 0.5)', 
+            textShadow: '0 0 10px rgba(96, 165, 250, 0.5)' 
+          },
+          '100%': { 
+            boxShadow: '0 0 20px rgba(96, 165, 250, 0.8), 0 0 30px rgba(96, 165, 250, 0.4)', 
+            textShadow: '0 0 20px rgba(96, 165, 250, 0.8)' 
+          }
+        },
+        glowOrange: {
+          '0%': { 
+            boxShadow: '0 0 5px rgba(249, 115, 22, 0.5)', 
+            textShadow: '0 0 10px rgba(249, 115, 22, 0.5)' 
+          },
+          '100%': { 
+            boxShadow: '0 0 20px rgba(249, 115, 22, 0.8), 0 0 30px rgba(249, 115, 22, 0.4)', 
+            textShadow: '0 0 20px rgba(249, 115, 22, 0.8)' 
+          }
         },
         fadeIn: {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
@@ -44,6 +74,14 @@ module.exports = {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        scan: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-4px)' }
         }
       },
       transitionTimingFunction: {

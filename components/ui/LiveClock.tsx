@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { formatTime, formatDate, getTimeOfDay } from '@/lib/utils';
 
 interface LiveClockProps {
   className?: string;
@@ -12,8 +11,8 @@ interface LiveClockProps {
 
 export default function LiveClock({ 
   className = '', 
-  showSeconds = true, 
-  showDate = true 
+  showSeconds = false, 
+  showDate = false 
 }: LiveClockProps) {
   const [time, setTime] = useState<Date>(new Date());
   const [mounted, setMounted] = useState(false);
@@ -29,76 +28,67 @@ export default function LiveClock({
 
   if (!mounted) {
     return (
-      <div className={`animate-pulse ${className}`}>
-        <div className="h-12 bg-command-surface rounded mb-2" />
-        {showDate && <div className="h-6 bg-command-surface rounded" />}
+      <div className={`${className}`}>
+        <div className="h-4 w-16 bg-command-surface/20 rounded animate-pulse" />
       </div>
     );
   }
 
-  const timeOfDay = getTimeOfDay();
-  const timeString = formatTime(time);
-  const dateString = formatDate(time);
-
-  const getTimeIcon = () => {
-    switch (timeOfDay) {
-      case 'morning': return '🌅';
-      case 'afternoon': return '☀️';
-      case 'evening': return '🌇';
-      case 'night': return '🌙';
-      default: return '⏰';
-    }
+  const formatTime = (date: Date) => {
+    return {
+      time: date.toLocaleTimeString('en-US', { 
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      seconds: date.toLocaleTimeString('en-US', { 
+        hour12: false,
+        second: '2-digit'
+      }).split(':')[2],
+      date: date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: '2-digit' 
+      }).replace(' ', '.').toUpperCase()
+    };
   };
 
+  const { time: timeStr, seconds, date } = formatTime(time);
+
   return (
-    <motion.div 
-      className={`${className}`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'smooth' }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+      className={`flex items-center gap-3 ${className}`}
     >
-      <div className="flex items-center gap-3 mb-2">
-        <motion.span 
-          className="text-2xl"
-          key={timeOfDay}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          {getTimeIcon()}
-        </motion.span>
-        <div className="font-mono font-bold text-command-primary">
-          <motion.span
-            key={timeString}
-            initial={{ opacity: 0.7 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            className="text-4xl tracking-wider"
-          >
-            {showSeconds ? timeString : timeString.slice(0, -3)}
-          </motion.span>
-        </div>
-      </div>
-
-      {showDate && (
-        <motion.div 
-          className="text-command-muted text-lg"
-          initial={{ opacity: 0 }}
+      <div className="flex items-center gap-1 font-mono text-xs">
+        <motion.span
+          key={timeStr}
+          initial={{ opacity: 0.8 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
+          className="text-command-primary tracking-wider"
         >
-          {dateString}
-        </motion.div>
+          {timeStr}
+        </motion.span>
+        {showSeconds && (
+          <motion.span
+            key={seconds}
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 0.7 }}
+            className="text-command-muted text-xs"
+          >
+            {seconds}
+          </motion.span>
+        )}
+      </div>
+      {showDate && (
+        <>
+          <div className="w-px h-3 bg-command-border opacity-50"></div>
+          <span className="font-mono text-xs text-command-muted tracking-wide">
+            {date}
+          </span>
+        </>
       )}
-
-      <motion.div 
-        className="mt-2 text-sm text-command-muted capitalize"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.3 }}
-      >
-        Good {timeOfDay}
-      </motion.div>
     </motion.div>
   );
 }
