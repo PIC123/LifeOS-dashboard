@@ -10,7 +10,7 @@ import {
   ChartBarIcon,
   CalendarIcon,
   WifiIcon,
-  BatteryIcon,
+  Battery0Icon,
   CloudIcon,
   SunIcon,
   MoonIcon,
@@ -63,7 +63,7 @@ export const StatusOnline = ({ className = '', size = 'md' }: IconProps) => (
 );
 
 export const StatusBattery = ({ className = '', size = 'md' }: IconProps) => (
-  <BatteryIcon className={`${sizeClasses[size]} ${className}`} />
+  <Battery0Icon className={`${sizeClasses[size]} ${className}`} />
 );
 
 export const StatusCloud = ({ className = '', size = 'md' }: IconProps) => (

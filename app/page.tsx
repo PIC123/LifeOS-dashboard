@@ -173,7 +173,12 @@ export default function Dashboard() {
             transition={{ delay: 0.4 }}
             className="space-y-6"
           >
-            <TodayPanel />
+            <TodayPanel 
+              habits={habits}
+              onMarkAllComplete={() => {
+                setHabits(prev => prev.map(h => ({ ...h, completed: true })));
+              }}
+            />
           </motion.div>
         </motion.div>
       </main>
