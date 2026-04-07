@@ -6,15 +6,19 @@ import { Toaster } from 'react-hot-toast';
 import HabitTracker from '@/components/HabitTracker';
 import TodayPanel from '@/components/TodayPanel';
 import CalendarView from '@/components/Calendar/CalendarView';
+import KnowledgeGraph from '@/components/Knowledge/KnowledgeGraph';
+import RemindersPanel from '@/components/Reminders/RemindersPanel';
 import { mockHabitsData, type Habit } from '@/lib/habitParser';
 import { saveToLocalStorage, loadFromLocalStorage } from '@/lib/utils';
 import { useMobile, useSwipe } from '@/hooks/useMobile';
 import { useCalendar } from '@/hooks/useCalendar';
 import { useProjects } from '@/hooks/useProjects';
+import MobileNavigation from '@/components/Mobile/MobileNavigation';
 
 export default function RetroFuturisticDashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [mobileSection, setMobileSection] = useState('dashboard');
   const { isMobile } = useMobile();
   
   // Calendar integration
@@ -219,12 +223,34 @@ export default function RetroFuturisticDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="col-span-12"
+            className="col-span-12 lg:col-span-8"
           >
             <CalendarView 
               habits={habits}
               events={events}
               reminders={reminders}
+            />
+          </motion.div>
+
+          {/* Reminders System Panel */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.7 }}
+            className="col-span-12 lg:col-span-4"
+          >
+            <RemindersPanel />
+          </motion.div>
+
+          {/* Knowledge Graph Panel */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="col-span-12"
+          >
+            <KnowledgeGraph 
+              projects={projects}
             />
           </motion.div>
 
