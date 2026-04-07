@@ -57,7 +57,7 @@ class GoogleCalendarService {
       const events = response.data.items || [];
 
       return events
-        .map((event): CalendarEvent | null => {
+        .map((event: any): CalendarEvent | null => {
           const calendarEvent = normalizeCalendarEvent({
             id: event.id || '',
             title: event.summary || 'Untitled Event',
