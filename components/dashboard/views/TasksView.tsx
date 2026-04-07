@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   Squares2X2Icon,
   ListBulletIcon,
-  CalendarViewIcon,
+  CalendarIcon,
   PlusIcon,
   FunnelIcon,
   MagnifyingGlassIcon
@@ -47,10 +47,10 @@ export default function TasksView({
   const filteredTasks = tasks.filter(task => {
     // Status filter
     if (filterStatus !== 'all' && task.status !== filterStatus) return false;
-    
+
     // Priority filter
     if (filterPriority !== 'all' && task.priority !== filterPriority) return false;
-    
+
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -60,7 +60,7 @@ export default function TasksView({
         task.tags.some(tag => tag.toLowerCase().includes(query))
       );
     }
-    
+
     return true;
   });
 
@@ -80,7 +80,7 @@ export default function TasksView({
     if (a.dueDate && b.dueDate) {
       const dateDiff = a.dueDate.localeCompare(b.dueDate);
       if (dateDiff !== 0) return dateDiff;
-      
+
       // If same date, sort by time
       if (a.dueTime && b.dueTime) {
         return a.dueTime.localeCompare(b.dueTime);
@@ -130,7 +130,7 @@ export default function TasksView({
             {[
               { mode: 'kanban', icon: Squares2X2Icon, label: 'KANBAN' },
               { mode: 'list', icon: ListBulletIcon, label: 'LIST' },
-              { mode: 'calendar', icon: CalendarViewIcon, label: 'CALENDAR' }
+              { mode: 'calendar', icon: CalendarIcon, label: 'CALENDAR' }
             ].map(({ mode, icon: Icon, label }) => (
               <button
                 key={mode}
@@ -295,7 +295,7 @@ export default function TasksView({
                       📝 NO.TASKS.FOUND
                     </div>
                     <div className="text-sm">
-                      {searchQuery 
+                      {searchQuery
                         ? `No tasks match "${searchQuery}"`
                         : filterStatus !== 'all' || filterPriority !== 'all'
                         ? 'No tasks match the selected filters'
@@ -325,7 +325,7 @@ export default function TasksView({
               transition={{ duration: 0.3 }}
               className="bg-command-surface/20 border border-command-border/30 rounded-lg p-8 text-center"
             >
-              <CalendarViewIcon className="w-16 h-16 text-command-muted mx-auto mb-4" />
+              <CalendarIcon className="w-16 h-16 text-command-muted mx-auto mb-4" />
               <div className="font-mono text-xl text-command-text mb-2">
                 CALENDAR.VIEW
               </div>
