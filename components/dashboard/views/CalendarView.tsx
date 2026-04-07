@@ -72,7 +72,7 @@ export default function CalendarView({
     // Next month's leading days
     const totalCells = Math.ceil(days.length / 7) * 7;
     for (let i = days.length; i < totalCells; i++) {
-      const nextDate = new Date(year, month, lastDay.getDate() + (i - days.length + 1));
+      const nextDate: Date = new Date(year, month, lastDay.getDate() + (i - days.length + 1));
       days.push({
         date: nextDate,
         isCurrentMonth: false,
