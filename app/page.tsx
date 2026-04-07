@@ -10,6 +10,7 @@ import { mockHabitsData, type Habit } from '@/lib/habitParser';
 import { saveToLocalStorage, loadFromLocalStorage } from '@/lib/utils';
 import { useMobile, useSwipe } from '@/hooks/useMobile';
 import { useCalendar } from '@/hooks/useCalendar';
+import { useProjects } from '@/hooks/useProjects';
 
 export default function RetroFuturisticDashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -21,6 +22,9 @@ export default function RetroFuturisticDashboard() {
     timeMin: new Date(),
     timeMax: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Next 30 days
   });
+  
+  // Projects integration (real PARA system data)
+  const { projects, areas, loading: projectsLoading } = useProjects();
 
   // Load habits from localStorage on mount
   useEffect(() => {
@@ -243,35 +247,61 @@ export default function RetroFuturisticDashboard() {
               </div>
             </div>
 
-            {/* Project Grid */}
+            {/* Real Project Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="bg-command-panel/30 border border-command-primary/30 rounded p-4 hover:border-command-primary/60 transition-all"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-sm text-command-text">LIFEOS.DASHBOARD</span>
-                  <div className="text-command-primary font-mono text-sm">95%</div>
+              {projectsLoading ? (
+                // Loading state
+                <div className="col-span-2 text-center py-8">
+                  <div className="font-mono text-sm text-command-muted">LOADING.PROJECT.DATA...</div>
                 </div>
-                <div className="w-full bg-command-background/50 rounded-full h-2 mb-2">
-                  <div className="bg-gradient-to-r from-command-primary to-command-accent h-2 rounded-full" style={{width: '95%'}}></div>
-                </div>
-                <div className="text-xs text-command-muted font-mono">PERSONAL.COMMAND.CENTER</div>
-              </motion.div>
-
-              <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="bg-command-panel/30 border border-command-secondary/30 rounded p-4 hover:border-command-secondary/60 transition-all"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-sm text-command-text">HEALTH.ROUTINE</span>
-                  <div className="text-command-secondary font-mono text-sm">67%</div>
-                </div>
-                <div className="w-full bg-command-background/50 rounded-full h-2 mb-2">
-                  <div className="bg-gradient-to-r from-command-secondary to-command-accent h-2 rounded-full" style={{width: '67%'}}></div>
-                </div>
-                <div className="text-xs text-command-muted font-mono">MORNING.OPTIMIZATION</div>
-              </motion.div>
+              ) : (
+                projects.slice(0, 4).map((project, index) => (
+                  <motion.div 
+                    key={project.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ scale: 1.02 }}
+                    className={`bg-command-panel/30 border rounded p-4 hover:border-command-primary/60 transition-all ${
+                      project.priority === 'high' 
+                        ? 'border-command-primary/30' 
+                        : project.priority === 'medium'
+                        ? 'border-command-secondary/30'
+                        : 'border-command-accent/30'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-mono text-sm text-command-text">
+                        {project.name.toUpperCase().replace(/\s/g, '.')}
+                      </span>
+                      <div className={`font-mono text-sm ${
+                        project.priority === 'high' 
+                          ? 'text-command-primary' 
+                          : project.priority === 'medium'
+                          ? 'text-command-secondary'
+                          : 'text-command-accent'
+                      }`}>
+                        {project.progress}%
+                      </div>
+                    </div>
+                    <div className="w-full bg-command-background/50 rounded-full h-2 mb-2">
+                      <div 
+                        className={`h-2 rounded-full ${
+                          project.priority === 'high'
+                            ? 'bg-gradient-to-r from-command-primary to-command-accent'
+                            : project.priority === 'medium' 
+                            ? 'bg-gradient-to-r from-command-secondary to-command-accent'
+                            : 'bg-gradient-to-r from-command-accent to-command-primary'
+                        }`}
+                        style={{width: `${project.progress}%`}}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-command-muted font-mono">
+                      {project.status} • {project.lastUpdated.split('-')[1]}.{project.lastUpdated.split('-')[2]}
+                    </div>
+                  </motion.div>
+                ))
+              )}
             </div>
           </motion.div>
 
