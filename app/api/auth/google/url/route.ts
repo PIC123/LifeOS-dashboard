@@ -10,11 +10,11 @@ export async function GET() {
       success: true,
     });
   } catch (error) {
-    console.error('Auth URL generation error:', error);
+    console.error('OAuth URL generation error:', error);
     
     return NextResponse.json(
       { 
-        error: 'Failed to generate auth URL',
+        error: 'Failed to generate OAuth URL',
         success: false,
       },
       { status: 500 }
