@@ -5,8 +5,6 @@
 
 import fs from 'fs';
 import path from 'path';
-// @ts-ignore
-import matter from 'gray-matter';
 
 const ZETTELKASTEN_PATH = '/home/openclaw/.openclaw/workspace/zettelkasten';
 
@@ -50,7 +48,6 @@ class ZettelkastenService {
       const notes = limitedFiles.map(file => {
         const filePath = path.join(notesDir, file);
         const content = fs.readFileSync(filePath, 'utf8');
-        const parsed = matter(content);
         
         // Extract timestamp from filename (format: YYYYMMDD-HHMM-title.md)
         const timestamp = file.substring(0, 13); // YYYYMMDD-HHMM
@@ -60,19 +57,19 @@ class ZettelkastenService {
         const title = file.replace(/^\d{8}-\d{4}-/, '').replace('.md', '').replace(/-/g, ' ');
         
         // Extract connections from content (basic [[link]] detection)
-        const connections = this.extractConnections(parsed.content);
+        const connections = this.extractConnections(content);
         
-        // Extract tags from frontmatter or content
-        const tags = parsed.data.tags || this.extractTags(parsed.content);
+        // Extract tags from content
+        const tags = this.extractTags(content);
 
         return {
           id: timestamp,
           title: title.charAt(0).toUpperCase() + title.slice(1),
-          content: parsed.content,
+          content: content,
           created,
           tags,
           connections,
-          frontmatter: parsed.data,
+          frontmatter: {},
         };
       });
 
@@ -99,16 +96,15 @@ class ZettelkastenService {
       const maps = files.map(file => {
         const filePath = path.join(mapsDir, file);
         const content = fs.readFileSync(filePath, 'utf8');
-        const parsed = matter(content);
         const stats = fs.statSync(filePath);
         
         const title = file.replace('.md', '').replace(/-/g, ' ');
-        const connectedNotes = this.extractConnections(parsed.content);
+        const connectedNotes = this.extractConnections(content);
 
         return {
           id: file.replace('.md', ''),
           title: title.charAt(0).toUpperCase() + title.slice(1),
-          content: parsed.content,
+          content: content,
           connectedNotes,
           lastUpdated: stats.mtime,
         };
