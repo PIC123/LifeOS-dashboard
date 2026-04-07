@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ConfettiParticle {
@@ -26,6 +26,17 @@ export default function CelebrationEffect({
   duration = 3000 
 }: CelebrationEffectProps) {
   const [particles, setParticles] = useState<ConfettiParticle[]>([]);
+  
+  // Pre-generate sparkle positions to avoid calling Math.random during render
+  const sparklePositions = useMemo(() => {
+    if (typeof window === 'undefined') return [];
+    return Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      delay: Math.random() * 2,
+    }));
+  }, [isActive]);
 
   useEffect(() => {
     if (!isActive) return;
@@ -85,7 +96,7 @@ export default function CelebrationEffect({
             <motion.div
               key={particle.id}
               custom={particle}
-              // @ts-ignore - Complex Framer Motion variants typing issue  
+              // @ts-expect-error - Complex Framer Motion variants typing issue  
               variants={particleVariants}
               initial="initial"
               animate="animate"
@@ -125,14 +136,14 @@ export default function CelebrationEffect({
           </motion.div>
 
           {/* Sparkle Effects */}
-          {[...Array(20)].map((_, i) => (
+          {sparklePositions.map((sparkle) => (
             <motion.div
-              key={`sparkle-${i}`}
+              key={`sparkle-${sparkle.id}`}
               initial={{ 
                 opacity: 0,
                 scale: 0,
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
+                x: sparkle.x,
+                y: sparkle.y,
               }}
               animate={{
                 opacity: [0, 1, 0],
@@ -141,7 +152,7 @@ export default function CelebrationEffect({
               }}
               transition={{
                 duration: 1.5,
-                delay: Math.random() * 2,
+                delay: sparkle.delay,
                 repeat: 1,
               }}
               className="absolute text-command-accent text-2xl pointer-events-none"

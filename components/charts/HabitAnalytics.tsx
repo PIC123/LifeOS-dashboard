@@ -11,8 +11,7 @@ import {
   AreaChart,
   Area,
   BarChart,
-  Bar,
-  TooltipProps
+  Bar
 } from 'recharts';
 import { DataChart, AchievementStreak, EffectSparkles } from '@/components/ui/Icons';
 import { Habit } from '@/lib/habitParser';
@@ -56,7 +55,7 @@ function generateHabitBreakdown(habits: Habit[]) {
 }
 
 // Custom tooltip component outside render function
-const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-command-surface border border-command-border rounded-lg p-3 shadow-lg">

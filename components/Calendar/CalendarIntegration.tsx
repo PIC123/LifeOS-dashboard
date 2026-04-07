@@ -13,6 +13,7 @@ import {
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, addWeeks, subWeeks, addMonths, subMonths, startOfMonth, endOfMonth, isSameDay, isToday, isPast, isFuture } from 'date-fns';
+import { safeDateString, safeToDate, normalizeCalendarEvent, isValidCalendarEvent, safeFormatTime } from '@/lib/dateUtils';
 import TaskQuickAdd from '../Tasks/TaskQuickAdd';
 
 interface CalendarIntegrationProps {
@@ -67,15 +68,13 @@ export default function CalendarIntegration({
       const dateStr = date.toISOString().split('T')[0];
       const dayTasks = tasks.filter(task => task.dueDate === dateStr);
       const dayEvents = events.filter(event => {
-        try {
-          // Ensure event.start is a Date object
-          const startDate = event.start instanceof Date ? event.start : new Date(event.start);
-          const eventDate = startDate.toISOString().split('T')[0];
-          return eventDate === dateStr;
-        } catch (error) {
-          console.warn('Invalid date in event:', event);
+        // Use safe date utilities to handle date conversion
+        if (!isValidCalendarEvent(event)) {
+          console.warn('Invalid calendar event:', event);
           return false;
         }
+        const eventDateStr = safeDateString(event.start);
+        return eventDateStr === dateStr;
       });
 
       return {
@@ -104,7 +103,12 @@ export default function CalendarIntegration({
   );
 
   const upcomingEvents = events.filter(event => {
-    const eventStart = event.start.getTime();
+    const eventStartDate = safeToDate(event.start);
+    if (!eventStartDate) {
+      console.warn('Invalid start date in event:', event);
+      return false;
+    }
+    const eventStart = eventStartDate.getTime();
     const now = new Date().getTime();
     const nextDay = now + 24 * 60 * 60 * 1000;
     return eventStart >= now && eventStart <= nextDay;
@@ -323,7 +327,11 @@ export default function CalendarIntegration({
                   <div key={event.id} className="text-xs">
                     <div className="text-command-text">{event.title}</div>
                     <div className="text-command-muted font-mono">
-                      {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
+                      {(() => {
+                        const startTime = safeFormatTime(event.start, { hour: '2-digit', minute: '2-digit', hour12: false });
+                        const endTime = safeFormatTime(event.end, { hour: '2-digit', minute: '2-digit', hour12: false });
+                        return startTime && endTime ? `${startTime} - ${endTime}` : 'Invalid time';
+                      })()}
                     </div>
                   </div>
                 ))}

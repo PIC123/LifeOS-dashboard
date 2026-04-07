@@ -20,18 +20,40 @@ interface VoiceMemoModalProps {
   onClose: () => void;
 }
 
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+      };
+      isFinal: boolean;
+    };
+  };
+}
+
+interface SpeechRecognitionError {
+  error: string;
+}
+
 export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [isSupported, setIsSupported] = useState(false);
-  const [startTime, setStartTime] = useState<number>(0);
-  const recognitionRef = useRef<any>(null);
-
-  useEffect(() => {
+  const [isSupported, setIsSupported] = useState(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      return !!SpeechRecognition;
+    }
+    return false;
+  });
+  const [startTime, setStartTime] = useState<number>(0);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isSupported) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
-        setIsSupported(true);
         recognitionRef.current = new SpeechRecognition();
         const recognition = recognitionRef.current;
         
@@ -44,7 +66,7 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
           setStartTime(Date.now());
         };
 
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
           let interimTranscript = '';
           let finalTranscript = '';
 
@@ -60,7 +82,7 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
           setTranscript(prev => prev + finalTranscript + interimTranscript);
         };
 
-        recognition.onerror = (event: any) => {
+        recognition.onerror = (event: SpeechRecognitionError) => {
           console.error('Speech recognition error:', event.error);
           toast.error('Voice recognition error. Please try again.');
           setIsRecording(false);
@@ -152,7 +174,7 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
                   Voice Recognition Not Supported
                 </h3>
                 <p className="text-command-muted mb-6">
-                  Your browser doesn't support voice recognition. Please try using Chrome or Edge.
+                  Your browser doesn&apos;t support voice recognition. Please try using Chrome or Edge.
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -187,7 +209,7 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              // @ts-ignore - Framer Motion transition typing issue
+              // @ts-expect-error - Framer Motion transition typing issue
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               className="w-full max-w-md bg-command-surface border border-command-border rounded-xl p-6 shadow-2xl"
             >
