@@ -48,7 +48,7 @@ export default function VoiceMemoModal({ isOpen, onClose }: VoiceMemoModalProps)
     return false;
   });
   const [startTime, setStartTime] = useState<number>(0);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && isSupported) {
