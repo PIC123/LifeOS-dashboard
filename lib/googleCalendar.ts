@@ -51,7 +51,7 @@ class GoogleCalendarService {
         end: new Date(event.end?.dateTime || event.end?.date || ''),
         description: event.description || undefined,
         type: 'event',
-        color: this.getEventColor(event.colorId),
+        color: this.getEventColor(event.colorId || undefined),
       }));
     } catch (error) {
       console.error('Error fetching calendar events:', error);
@@ -60,7 +60,7 @@ class GoogleCalendarService {
     }
   }
 
-  private getEventColor(colorId?: string): string {
+  private getEventColor(colorId?: string | null): string {
     // Map Google Calendar color IDs to our retro theme colors
     const colorMap: Record<string, string> = {
       '1': '#00ffff', // cyan
