@@ -94,7 +94,7 @@ export default function PersonalCommandCenter() {
   // Calculate stats for sidebar
   const sidebarStats = {
     activeProjects: projects?.filter((p: any) => p.status === 'active')?.length || 0,
-    totalTasks: tasks?.length || 0,
+    totalTasks: taskStats?.totalTasks || 0,
     recentNotes: data.knowledge?.stats?.totalNotes || 0,
     memoryDays: data.memory?.stats?.totalDays || 0,
   };

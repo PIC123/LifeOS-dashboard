@@ -4,7 +4,7 @@ import { FolderOpen, CheckSquare, Brain, MessageSquare, TrendingUp, Users } from
 
 interface DashboardStatsProps {
   projects?: any[];
-  tasks?: any;
+  tasks?: any[];
   knowledge?: any;
   memory?: any;
 }
@@ -15,7 +15,7 @@ export default function DashboardStats({ projects, tasks, knowledge, memory }: D
   const totalProjects = projects?.length || 0;
   
   // Task stats
-  const completedTasks = tasks?.filter((t: any) => t.completed).length || 0;
+  const completedTasks = tasks?.filter((t: any) => t.status === 'completed').length || 0;
   const totalTasks = tasks?.length || 0;
   
   // Knowledge stats
