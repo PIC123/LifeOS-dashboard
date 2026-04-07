@@ -1,5 +1,4 @@
 import { google } from 'googleapis';
-import { normalizeCalendarEvent } from './dateUtils';
 
 export interface CalendarEvent {
   id: string;
@@ -12,9 +11,16 @@ export interface CalendarEvent {
 }
 
 class GoogleCalendarOAuthService {
-  private oauth2Client;
+  private oauth2Client: any;
 
   constructor() {
+    // Check if OAuth credentials are available
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      console.warn('Google OAuth credentials not configured');
+      this.oauth2Client = null;
+      return;
+    }
+
     this.oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
@@ -32,6 +38,10 @@ class GoogleCalendarOAuthService {
 
   // Get authorization URL for initial setup
   getAuthUrl(): string {
+    if (!this.oauth2Client) {
+      throw new Error('OAuth client not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.');
+    }
+
     const scopes = [
       'https://www.googleapis.com/auth/calendar.readonly',
       'https://www.googleapis.com/auth/calendar.events.readonly',
@@ -46,6 +56,10 @@ class GoogleCalendarOAuthService {
 
   // Exchange auth code for tokens
   async getTokens(code: string) {
+    if (!this.oauth2Client) {
+      throw new Error('OAuth client not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.');
+    }
+
     const { tokens } = await this.oauth2Client.getToken(code);
     this.oauth2Client.setCredentials(tokens);
     return tokens;
@@ -71,20 +85,15 @@ class GoogleCalendarOAuthService {
 
       const events = response.data.items || [];
 
-      return events
-        .map((event): CalendarEvent | null => {
-          const calendarEvent = normalizeCalendarEvent({
-            id: event.id || '',
-            title: event.summary || 'Untitled Event',
-            start: event.start?.dateTime || event.start?.date || '',
-            end: event.end?.dateTime || event.end?.date || '',
-            description: event.description || undefined,
-            type: 'event',
-            color: this.getEventColor(event.colorId || undefined),
-          });
-          return calendarEvent;
-        })
-        .filter((event): event is CalendarEvent => event !== null);
+      return events.map((event: any): CalendarEvent => ({
+        id: event.id || '',
+        title: event.summary || 'Untitled Event',
+        start: new Date(event.start?.dateTime || event.start?.date || ''),
+        end: new Date(event.end?.dateTime || event.end?.date || ''),
+        description: event.description || undefined,
+        type: 'event',
+        color: this.getEventColor(event.colorId || undefined),
+      }));
     } catch (error) {
       console.error('Error fetching calendar events:', error);
       // Return mock data for development
