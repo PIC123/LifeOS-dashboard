@@ -37,8 +37,15 @@ export default function DailyTaskList({
     task.status !== 'completed'
   );
   const todayEvents = events.filter(event => {
-    const eventDate = event.start.toISOString().split('T')[0];
-    return eventDate === today;
+    try {
+      // Ensure event.start is a Date object
+      const startDate = event.start instanceof Date ? event.start : new Date(event.start);
+      const eventDate = startDate.toISOString().split('T')[0];
+      return eventDate === today;
+    } catch (error) {
+      console.warn('Invalid date in event:', event);
+      return false;
+    }
   });
 
   const filteredTasks = todayTasks.filter(task => {

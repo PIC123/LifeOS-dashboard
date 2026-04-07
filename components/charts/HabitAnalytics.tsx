@@ -3,8 +3,6 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  LineChart, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -14,9 +12,7 @@ import {
   Area,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell
+  TooltipProps
 } from 'recharts';
 import { DataChart, AchievementStreak, EffectSparkles } from '@/components/ui/Icons';
 import { Habit } from '@/lib/habitParser';
@@ -59,6 +55,23 @@ function generateHabitBreakdown(habits: Habit[]) {
   }));
 }
 
+// Custom tooltip component outside render function
+const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-command-surface border border-command-border rounded-lg p-3 shadow-lg">
+        <p className="text-command-text font-medium">{label}</p>
+        {payload.map((entry, index) => (
+          <p key={index} className="text-sm" style={{ color: entry.color }}>
+            {entry.dataKey}: {entry.value}%
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function HabitAnalytics({ habits, className }: HabitAnalyticsProps) {
   const analyticsData = useMemo(() => generateAnalyticsData(), []);
   const habitBreakdown = useMemo(() => generateHabitBreakdown(habits), [habits]);
@@ -70,22 +83,6 @@ export default function HabitAnalytics({ habits, className }: HabitAnalyticsProp
   const currentStreak = 7; // Mock current streak
   const bestStreak = 21; // Mock best streak
   const weeklyAverage = 85; // Mock weekly average
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-command-surface border border-command-border rounded-lg p-3 shadow-lg">
-          <p className="text-command-text font-medium">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.dataKey}: {entry.value}%
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <motion.div 

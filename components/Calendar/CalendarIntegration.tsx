@@ -67,8 +67,15 @@ export default function CalendarIntegration({
       const dateStr = date.toISOString().split('T')[0];
       const dayTasks = tasks.filter(task => task.dueDate === dateStr);
       const dayEvents = events.filter(event => {
-        const eventDate = event.start.toISOString().split('T')[0];
-        return eventDate === dateStr;
+        try {
+          // Ensure event.start is a Date object
+          const startDate = event.start instanceof Date ? event.start : new Date(event.start);
+          const eventDate = startDate.toISOString().split('T')[0];
+          return eventDate === dateStr;
+        } catch (error) {
+          console.warn('Invalid date in event:', event);
+          return false;
+        }
       });
 
       return {

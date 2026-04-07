@@ -46,9 +46,28 @@ export function useCalendar({
       const result = await response.json();
 
       if (result.success) {
+        // Ensure all event dates are proper Date objects
+        const processEvents = (events: any[]) => 
+          events.map(event => {
+            try {
+              return {
+                ...event,
+                start: event.start instanceof Date ? event.start : new Date(event.start),
+                end: event.end instanceof Date ? event.end : new Date(event.end),
+              };
+            } catch (error) {
+              console.warn('Invalid date in event:', event);
+              return {
+                ...event,
+                start: new Date(),
+                end: new Date(),
+              };
+            }
+          });
+
         setData({
-          events: result.events || [],
-          reminders: result.reminders || [],
+          events: processEvents(result.events || []),
+          reminders: processEvents(result.reminders || []),
           loading: false,
           error: null,
         });
