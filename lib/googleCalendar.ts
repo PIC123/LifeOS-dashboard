@@ -49,7 +49,7 @@ class GoogleCalendarService {
         title: event.summary || 'Untitled Event',
         start: new Date(event.start?.dateTime || event.start?.date || ''),
         end: new Date(event.end?.dateTime || event.end?.date || ''),
-        description: event.description,
+        description: event.description || undefined,
         type: 'event',
         color: this.getEventColor(event.colorId),
       }));
