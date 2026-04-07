@@ -1,5 +1,4 @@
 import { google } from 'googleapis';
-import { normalizeCalendarEvent } from './dateUtils';
 
 export interface CalendarEvent {
   id: string;
@@ -56,20 +55,15 @@ class GoogleCalendarService {
 
       const events = response.data.items || [];
 
-      return events
-        .map((event: any): CalendarEvent | null => {
-          const calendarEvent = normalizeCalendarEvent({
-            id: event.id || '',
-            title: event.summary || 'Untitled Event',
-            start: event.start?.dateTime || event.start?.date || '',
-            end: event.end?.dateTime || event.end?.date || '',
-            description: event.description || undefined,
-            type: 'event',
-            color: this.getEventColor(event.colorId || undefined),
-          });
-          return calendarEvent;
-        })
-        .filter((event): event is CalendarEvent => event !== null);
+      return events.map((event: any): CalendarEvent => ({
+        id: event.id || '',
+        title: event.summary || 'Untitled Event',
+        start: new Date(event.start?.dateTime || event.start?.date || ''),
+        end: new Date(event.end?.dateTime || event.end?.date || ''),
+        description: event.description || undefined,
+        type: 'event',
+        color: this.getEventColor(event.colorId || undefined),
+      }));
     } catch (error) {
       console.error('Error fetching calendar events:', error);
       // Return mock data for development
