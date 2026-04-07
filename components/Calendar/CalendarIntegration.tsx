@@ -376,7 +376,11 @@ export default function CalendarIntegration({
                       <div key={event.id} className="text-xs">
                         <div className="text-command-accent">{event.title}</div>
                         <div className="text-command-muted font-mono">
-                          {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
+                          {(() => {
+                            const startTime = safeFormatTime(event.start, { hour: '2-digit', minute: '2-digit', hour12: false });
+                            const endTime = safeFormatTime(event.end, { hour: '2-digit', minute: '2-digit', hour12: false });
+                            return startTime && endTime ? `${startTime} - ${endTime}` : 'Invalid time';
+                          })()}
                         </div>
                       </div>
                     ))}

@@ -62,7 +62,7 @@ export default function MarkAllCompleteModal({
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              // @ts-ignore - Framer Motion transition typing issue
+              // @ts-expect-error - Framer Motion transition typing issue
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               className="w-full max-w-md bg-command-surface border border-command-border rounded-xl p-6 shadow-2xl"
             >
@@ -174,7 +174,7 @@ export default function MarkAllCompleteModal({
                       Perfect Day! 🎉
                     </h3>
                     <p className="text-command-muted">
-                      You've completed all your habits for today. Keep up the amazing work!
+                      You&apos;ve completed all your habits for today. Keep up the amazing work!
                     </p>
                   </motion.div>
                 )}

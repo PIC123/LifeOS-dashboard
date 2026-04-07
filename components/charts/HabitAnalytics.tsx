@@ -60,7 +60,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-command-surface border border-command-border rounded-lg p-3 shadow-lg">
         <p className="text-command-text font-medium">{label}</p>
-        {payload.map((entry, index) => (
+        {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.dataKey}: {entry.value}%
           </p>

@@ -6,6 +6,7 @@ import { Task } from '@/types/tasks';
 import { ProjectStatus } from '@/lib/paraSystem';
 import { CalendarEvent } from '@/lib/googleCalendarOAuth';
 import { CheckIcon, ClockIcon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { safeDateString, safeToDate, isValidCalendarEvent, safeFormatTime } from '@/lib/dateUtils';
 import TaskQuickAdd from './TaskQuickAdd';
 import TaskItem from './TaskItem';
 
@@ -37,15 +38,13 @@ export default function DailyTaskList({
     task.status !== 'completed'
   );
   const todayEvents = events.filter(event => {
-    try {
-      // Ensure event.start is a Date object
-      const startDate = event.start instanceof Date ? event.start : new Date(event.start);
-      const eventDate = startDate.toISOString().split('T')[0];
-      return eventDate === today;
-    } catch (error) {
-      console.warn('Invalid date in event:', event);
+    // Use safe date utilities to handle date conversion
+    if (!isValidCalendarEvent(event)) {
+      console.warn('Invalid calendar event:', event);
       return false;
     }
+    const eventDateStr = safeDateString(event.start);
+    return eventDateStr === today;
   });
 
   const filteredTasks = todayTasks.filter(task => {
@@ -251,9 +250,11 @@ export default function DailyTaskList({
                 <div className="flex-1">
                   <div className="text-sm text-command-text">{event.title}</div>
                   <div className="text-xs text-command-muted font-mono">
-                    {event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                    {' - '}
-                    {event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                    {(() => {
+                      const startTime = safeFormatTime(event.start, { hour: '2-digit', minute: '2-digit', hour12: false });
+                      const endTime = safeFormatTime(event.end, { hour: '2-digit', minute: '2-digit', hour12: false });
+                      return startTime && endTime ? `${startTime} - ${endTime}` : 'Invalid time';
+                    })()}
                   </div>
                 </div>
               </div>

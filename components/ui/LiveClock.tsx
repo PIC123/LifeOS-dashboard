@@ -18,12 +18,16 @@ export default function LiveClock({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    // Use a timeout to set mounted status to avoid immediate setState in effect
+    const mountTimeout = setTimeout(() => setMounted(true), 0);
     const timer = setInterval(() => {
       setTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(mountTimeout);
+      clearInterval(timer);
+    };
   }, []);
 
   if (!mounted) {

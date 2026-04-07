@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-// Import Pretext
-const pretext = require('pretext');
+// Import Pretext using dynamic import for better compatibility
+import pretext from 'pretext';
 
 interface PretextDisplayProps {
   content: string;
