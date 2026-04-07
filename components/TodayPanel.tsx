@@ -79,44 +79,34 @@ export default function TodayPanel({ habits = [], onMarkAllComplete }: TodayPane
         transition={{ duration: 0.2, delay: 0.1 }}
         className="bg-command-surface/20 border border-command-border/30 rounded-lg overflow-hidden"
       >
-        {/* Creative Status Header */}
-        <div className="px-6 py-4 border-b border-command-border/20">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-6">
-              {/* Vertical Status Line with Pretext */}
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-1 h-4 bg-command-accent/80 rounded-full animate-glow-orange"></div>
-                <RotatedLabel angle="rotate--90" glow="accent" className="text-xs" delay={0.05}>
-                  NOW
-                </RotatedLabel>
-              </div>
+        {/* Clean Status Header */}
+        <div className="px-6 py-3 border-b border-command-border/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-4">
+              {/* Simple Status Indicator */}
+              <div className="w-1 h-4 bg-command-accent/60 rounded-full animate-pulse"></div>
               
-              {/* Ultra-thin Header with Pretext */}
+              {/* Clean Header */}
               <div className="flex flex-col">
-                <SciFiTitle className="text-base text-command-text uppercase leading-none" delay={0.1}>
+                <h3 className="font-ultra font-ultra-thin text-base text-command-text tracking-super-wide uppercase leading-none">
                   STATUS
-                </SciFiTitle>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="w-10 h-px bg-command-primary/40"></div>
-                  <GlowingAccent color="primary" className="text-xs uppercase" delay={0.15}>
+                </h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <div className="w-8 h-px bg-command-primary/30"></div>
+                  <span className="font-ultra font-thin text-xs text-command-primary tracking-ultra-wide uppercase">
                     TODAY
-                  </GlowingAccent>
+                  </span>
                 </div>
               </div>
             </div>
             
-            {/* Rotated Date with Pretext */}
-            <SciFiTitle 
-              orientation="rotate--6" 
-              glow="primary" 
-              className="text-sm" 
-              delay={0.2}
-            >
+            {/* Clean Date */}
+            <div className="font-ultra font-thin text-sm text-command-primary tracking-wider">
               {new Date().toLocaleDateString('en-US', { 
                 month: 'short', 
                 day: '2-digit' 
               }).replace(' ', '.').toUpperCase()}
-            </SciFiTitle>
+            </div>
           </div>
 
           {/* Progress Summary */}
@@ -136,22 +126,17 @@ export default function TodayPanel({ habits = [], onMarkAllComplete }: TodayPane
           </div>
         </div>
 
-        {/* Ultra-thin Quick Actions */}
+        {/* Clean Quick Actions */}
         <div className="px-6 py-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="transform rotate-45">
-                <div className="w-1 h-1 bg-command-primary rounded-full"></div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-px bg-command-primary/30"></div>
-                <RotatedLabel angle="normal" className="text-xs text-command-muted" delay={0.25}>
-                  ACTIONS
-                </RotatedLabel>
-              </div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-1 h-1 bg-command-primary rounded-full"></div>
+              <span className="font-ultra font-thin text-xs text-command-muted tracking-mega-wide uppercase">
+                ACTIONS
+              </span>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-2">
               {quickActions.map((action, index) => (
                 <motion.button
                   key={action.id}
@@ -159,53 +144,41 @@ export default function TodayPanel({ habits = [], onMarkAllComplete }: TodayPane
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.2 }}
                   onClick={action.onClick}
-                  className="group w-full flex items-center justify-between py-3 px-3 rounded-md border border-transparent transition-all duration-200 hover:border-command-border/40 hover:bg-command-surface/20"
+                  className="group w-full flex items-center justify-between py-2.5 px-3 rounded-md border border-transparent transition-all duration-200 hover:border-command-border/40 hover:bg-command-surface/20"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-4 h-4 flex items-center justify-center text-${action.color} group-hover:animate-pulse transform group-hover:rotate-12 transition-transform`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 flex items-center justify-center text-${action.color} group-hover:animate-pulse transition-all`}>
                       <action.icon className="w-3 h-3" />
                     </div>
-                    <SciFiTitle className="text-sm text-command-text uppercase" delay={index * 0.1 + 0.3}>
+                    <span className="font-ultra font-thin text-sm text-command-text tracking-ultra-wide uppercase">
                       {action.label}
-                    </SciFiTitle>
+                    </span>
                   </div>
-                  <GlowingAccent 
-                    color="primary" 
-                    orientation="rotate--6" 
-                    className="text-xs opacity-0 group-hover:opacity-100 transition-all" 
-                    delay={index * 0.05 + 0.4}
-                  >
+                  <span className="font-ultra font-ultra-thin text-xs text-command-muted tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
                     {action.shortcut}
-                  </GlowingAccent>
+                  </span>
                 </motion.button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Ultra-thin System Info */}
+        {/* Clean System Info */}
         <div className="px-6 py-3 bg-command-background/20 border-t border-command-border/10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="transform rotate-45">
-                <div className="w-1 h-1 bg-command-primary rounded-full animate-pulse"></div>
-              </div>
-              <GlowingAccent color="primary" className="text-xs text-command-muted uppercase" delay={0.5}>
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-1 bg-command-primary rounded-full animate-pulse"></div>
+              <span className="font-ultra font-ultra-thin text-xs text-command-muted tracking-ultra-wide uppercase">
                 SYS.READY
-              </GlowingAccent>
+              </span>
             </div>
-            <SciFiTitle 
-              orientation="rotate-3" 
-              glow="primary" 
-              className="text-xs" 
-              delay={0.55}
-            >
+            <div className="font-ultra font-thin text-xs text-command-primary tracking-wider">
               {new Date().toLocaleTimeString('en-US', { 
                 hour12: false,
                 hour: '2-digit',
                 minute: '2-digit'
               })}
-            </SciFiTitle>
+            </div>
           </div>
         </div>
       </motion.div>

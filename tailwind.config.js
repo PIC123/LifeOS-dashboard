@@ -49,22 +49,18 @@ module.exports = {
       keyframes: {
         glowBlue: {
           '0%': { 
-            boxShadow: '0 0 5px rgba(96, 165, 250, 0.5)', 
-            textShadow: '0 0 10px rgba(96, 165, 250, 0.5)' 
+            boxShadow: '0 0 2px rgba(96, 165, 250, 0.3)' 
           },
           '100%': { 
-            boxShadow: '0 0 20px rgba(96, 165, 250, 0.8), 0 0 30px rgba(96, 165, 250, 0.4)', 
-            textShadow: '0 0 20px rgba(96, 165, 250, 0.8)' 
+            boxShadow: '0 0 8px rgba(96, 165, 250, 0.5)' 
           }
         },
         glowOrange: {
           '0%': { 
-            boxShadow: '0 0 5px rgba(249, 115, 22, 0.5)', 
-            textShadow: '0 0 10px rgba(249, 115, 22, 0.5)' 
+            boxShadow: '0 0 2px rgba(249, 115, 22, 0.3)' 
           },
           '100%': { 
-            boxShadow: '0 0 20px rgba(249, 115, 22, 0.8), 0 0 30px rgba(249, 115, 22, 0.4)', 
-            textShadow: '0 0 20px rgba(249, 115, 22, 0.8)' 
+            boxShadow: '0 0 8px rgba(249, 115, 22, 0.5)' 
           }
         },
         fadeIn: {

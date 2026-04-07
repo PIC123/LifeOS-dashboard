@@ -37,51 +37,36 @@ export default function HabitTracker({ habits, onToggleHabit }: HabitTrackerProp
       transition={{ duration: 0.2 }}
       className="bg-command-surface/30 border border-command-border/40 rounded-lg overflow-hidden"
     >
-      {/* Creative Header with Unique Text Orientation */}
-      <div className="px-6 py-4 border-b border-command-border/20">
+      {/* Clean Header */}
+      <div className="px-6 py-3 border-b border-command-border/20">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            {/* Vertical Progress Indicator with Pretext */}
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-1 h-6 bg-command-primary/60 rounded-full animate-glow-blue"></div>
-              <RotatedLabel angle="rotate--90" glow="primary" className="text-xs" delay={0.05}>
-                RUN
-              </RotatedLabel>
-            </div>
+          <div className="flex items-center gap-4">
+            {/* Simple Progress Indicator */}
+            <div className="w-1 h-4 bg-command-primary/60 rounded-full animate-pulse"></div>
             
-            {/* Ultra-thin Title with Pretext */}
+            {/* Clean Title */}
             <div className="flex flex-col">
-              <SciFiTitle className="text-base text-command-text uppercase leading-none" delay={0.1}>
+              <h2 className="font-ultra font-ultra-thin text-base text-command-text tracking-super-wide uppercase leading-none">
                 ROUTINE
-              </SciFiTitle>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="w-12 h-px bg-command-accent/40"></div>
-                <GlowingAccent color="accent" className="text-xs uppercase" delay={0.15}>
+              </h2>
+              <div className="flex items-center gap-2 mt-0.5">
+                <div className="w-8 h-px bg-command-accent/30"></div>
+                <span className="font-ultra font-thin text-xs text-command-accent tracking-ultra-wide uppercase">
                   EXEC
-                </GlowingAccent>
+                </span>
               </div>
             </div>
           </div>
           
-          {/* Rotated Counter with Pretext */}
-          <div className="text-center">
-            <SciFiTitle 
-              orientation="rotate-6" 
-              glow="primary" 
-              className="text-lg" 
-              delay={0.2}
-            >
-              {completedCount.toString()}
-            </SciFiTitle>
-            <div className="w-4 h-px bg-command-primary/40 mx-auto"></div>
-            <GlowingAccent 
-              color="primary" 
-              orientation="rotate-3" 
-              className="text-xs opacity-60" 
-              delay={0.25}
-            >
-              {habits.length.toString()}
-            </GlowingAccent>
+          {/* Clean Counter */}
+          <div className="text-right">
+            <div className="font-ultra font-thin text-lg text-command-primary tracking-wider">
+              {completedCount}
+            </div>
+            <div className="w-3 h-px bg-command-primary/30 ml-auto mt-0.5"></div>
+            <div className="font-ultra font-ultra-thin text-xs text-command-muted tracking-wide mt-0.5">
+              {habits.length}
+            </div>
           </div>
         </div>
       </div>
@@ -177,7 +162,7 @@ export default function HabitTracker({ habits, onToggleHabit }: HabitTrackerProp
         </div>
       </div>
 
-      {/* Ultra-thin Completion Status */}
+      {/* Clean Completion Status */}
       {completionPercentage === 100 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -185,20 +170,11 @@ export default function HabitTracker({ habits, onToggleHabit }: HabitTrackerProp
           transition={{ delay: 0.3 }}
           className="px-6 py-3 bg-command-primary/5 border-t border-command-primary/20"
         >
-          <div className="flex items-center gap-4">
-            <div className="transform rotate-45">
-              <div className="w-2 h-2 bg-command-accent rounded-full animate-glow-orange"></div>
-            </div>
-            <div className="flex flex-col">
-              <GlowingAccent 
-                color="accent" 
-                className="text-sm uppercase leading-none" 
-                delay={0.3}
-              >
-                **COMPLETE**
-              </GlowingAccent>
-              <div className="w-16 h-px bg-command-accent/40 mt-1"></div>
-            </div>
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 bg-command-accent rounded-full animate-pulse"></div>
+            <span className="font-ultra font-ultra-thin text-sm text-command-accent tracking-super-wide uppercase">
+              COMPLETE
+            </span>
           </div>
         </motion.div>
       )}

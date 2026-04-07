@@ -95,88 +95,63 @@ export default function Dashboard() {
       >
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Creative Logo Section */}
+            {/* Clean Logo Section */}
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.05 }}
-              className="flex items-center gap-8"
+              className="flex items-center gap-6"
             >
-              {/* Vertical Text */}
-              <div className="flex items-center gap-3">
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-1 h-8 bg-command-primary/80 rounded-full animate-glow-blue"></div>
-                  <div className="w-1 h-6 bg-command-accent/80 rounded-full animate-glow-orange"></div>
-                  <div className="w-1 h-4 bg-command-text/60 rounded-full animate-pulse"></div>
-                </div>
-                <RotatedLabel angle="rotate--90" glow="primary" delay={0.05}>
-                  SYS
-                </RotatedLabel>
+              {/* Status Indicators */}
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-6 bg-command-primary/60 rounded-full animate-pulse"></div>
+                <div className="w-1 h-4 bg-command-accent/60 rounded-full animate-pulse"></div>
+                <div className="w-1 h-3 bg-command-text/40 rounded-full animate-pulse"></div>
               </div>
 
-              {/* Main Title - Ultra Thin & Tall with Pretext */}
+              {/* Clean Title */}
               <div className="flex flex-col">
-                <SciFiTitle className="text-lg text-command-text uppercase leading-none" delay={0.1}>
+                <h1 className="font-ultra font-ultra-thin text-xl text-command-text tracking-super-wide uppercase leading-none">
                   LIFEOS
-                </SciFiTitle>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="w-8 h-px bg-command-primary/40"></div>
-                  <GlowingAccent color="accent" className="text-xs uppercase" delay={0.15}>
+                </h1>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <div className="w-6 h-px bg-command-primary/30"></div>
+                  <span className="font-ultra font-thin text-xs text-command-accent tracking-ultra-wide uppercase">
                     COMMAND
-                  </GlowingAccent>
+                  </span>
                 </div>
               </div>
             </motion.div>
             
-            {/* Rotated Status Panel */}
+            {/* Clean Status Panel */}
             <motion.div 
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="flex items-center gap-8"
+              className="flex items-center gap-6"
             >
-              {/* Status Grid with Pretext */}
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-1">
-                    <div className="w-1 h-1 bg-command-primary rounded-full animate-pulse" />
-                    <RotatedLabel angle="normal" className="text-command-muted text-xs" delay={0.2}>
-                      SYS
-                    </RotatedLabel>
-                  </div>
-                  <GlowingAccent color="primary" className="text-xs" delay={0.25}>
-                    ONLINE
-                  </GlowingAccent>
+              {/* Clean Status Grid */}
+              <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1 h-1 bg-command-primary rounded-full animate-pulse" />
+                  <span className="font-ultra font-thin text-command-muted tracking-wide uppercase">SYS</span>
+                  <span className="font-ultra font-ultra-thin text-command-primary tracking-wide">ONLINE</span>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-1">
-                    <div className="w-1 h-1 bg-command-accent rounded-full animate-pulse" />
-                    <RotatedLabel angle="normal" className="text-command-muted text-xs" delay={0.3}>
-                      NET
-                    </RotatedLabel>
-                  </div>
-                  <GlowingAccent color="accent" className="text-xs" delay={0.35}>
-                    SYNC
-                  </GlowingAccent>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1 h-1 bg-command-accent rounded-full animate-pulse" />
+                  <span className="font-ultra font-thin text-command-muted tracking-wide uppercase">NET</span>
+                  <span className="font-ultra font-ultra-thin text-command-accent tracking-wide">SYNC</span>
                 </div>
               </div>
 
-              {/* Vertical Separator */}
-              <div className="h-8 w-px bg-command-border/30"></div>
-
-              {/* Rotated Time with Pretext */}
-              <SciFiTitle 
-                orientation="rotate-12" 
-                glow="primary" 
-                className="text-sm" 
-                delay={0.4}
-              >
+              {/* Clean Time */}
+              <div className="font-ultra font-thin text-sm text-command-primary tracking-wider">
                 {new Date().toLocaleTimeString('en-US', { 
                   hour12: false, 
                   hour: '2-digit', 
                   minute: '2-digit' 
                 })}
-              </SciFiTitle>
+              </div>
             </motion.div>
           </div>
         </div>
