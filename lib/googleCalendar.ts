@@ -12,19 +12,24 @@ export interface CalendarEvent {
 }
 
 class GoogleCalendarService {
-  private calendar;
+  private calendar: any;
 
   constructor() {
-    // Initialize Google Calendar API
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      },
-      scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
-    });
+    // Initialize Google Calendar API only if credentials are available
+    if (process.env.GOOGLE_CLIENT_EMAIL || process.env.GOOGLE_CLIENT_ID) {
+      const auth = new google.auth.GoogleAuth({
+        credentials: {
+          client_email: process.env.GOOGLE_CLIENT_EMAIL,
+          private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        },
+        scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+      });
 
-    this.calendar = google.calendar({ version: 'v3', auth });
+      this.calendar = google.calendar({ version: 'v3', auth });
+    } else {
+      // No credentials available, calendar will be null
+      this.calendar = null;
+    }
   }
 
   async getEvents(
@@ -33,6 +38,12 @@ class GoogleCalendarService {
     timeMax?: Date,
     maxResults: number = 50
   ): Promise<CalendarEvent[]> {
+    // Check if credentials are available
+    if (!this.calendar || (!process.env.GOOGLE_CLIENT_EMAIL && !process.env.GOOGLE_CLIENT_ID)) {
+      console.warn('Google Calendar credentials not configured, using mock data');
+      return this.getMockEvents();
+    }
+
     try {
       const response = await this.calendar.events.list({
         calendarId,
