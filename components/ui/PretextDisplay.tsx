@@ -32,15 +32,25 @@ export default function PretextDisplay({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    try {
-      // Process the content with Pretext
-      const processed = pretext(content);
-      setRendered(processed);
-    } catch (error) {
-      console.warn('Pretext processing failed, using raw content:', error);
-      setRendered(content);
-    }
+    // Use timeout to avoid immediate setState in effect
+    const mountTimeout = setTimeout(() => setMounted(true), 0);
+    
+    // Process content in a separate timeout to avoid synchronous setState
+    const processTimeout = setTimeout(() => {
+      try {
+        // Process the content with Pretext
+        const processed = pretext(content);
+        setRendered(processed);
+      } catch (error) {
+        console.warn('Pretext processing failed, using raw content:', error);
+        setRendered(content);
+      }
+    }, 0);
+
+    return () => {
+      clearTimeout(mountTimeout);
+      clearTimeout(processTimeout);
+    };
   }, [content]);
 
   const getOrientationClass = () => {

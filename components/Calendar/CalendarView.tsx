@@ -18,6 +18,7 @@ import {
   isToday,
   isSameMonth
 } from 'date-fns';
+import { safeToDate, safeFormatTime, normalizeCalendarEvent } from '@/lib/dateUtils';
 import { Habit } from '@/lib/habitParser';
 
 type ViewMode = 'agenda' | 'week' | 'month';
@@ -49,10 +50,10 @@ export default function CalendarView({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Combine all calendar items
+  // Combine all calendar items, ensuring all have proper Date objects
   const allItems = [
-    ...events,
-    ...reminders,
+    ...events.map(event => normalizeCalendarEvent(event)).filter(Boolean),
+    ...reminders.map(reminder => normalizeCalendarEvent(reminder)).filter(Boolean),
     // Convert habits to calendar events for today
     ...habits.map(habit => ({
       id: `habit-${habit.id}`,
@@ -62,7 +63,7 @@ export default function CalendarView({
       type: 'habit' as const,
       color: habit.completed ? '#00ffff' : '#ff6b35'
     }))
-  ];
+  ].filter(Boolean);
 
   const ViewToggle = () => (
     <div className="flex bg-command-panel/30 border border-command-border/30 rounded-lg p-1">
@@ -85,9 +86,10 @@ export default function CalendarView({
   );
 
   const AgendaView = () => {
-    const todayItems = allItems.filter(item => 
-      isSameDay(item.start, selectedDate)
-    );
+    const todayItems = allItems.filter(item => {
+      const itemStartDate = safeToDate(item.start);
+      return itemStartDate ? isSameDay(itemStartDate, selectedDate) : false;
+    });
 
     return (
       <div className="space-y-3">
@@ -141,7 +143,7 @@ export default function CalendarView({
                       {item.title}
                     </div>
                     <div className="font-mono text-xs text-command-muted">
-                      {format(item.start, 'HH:mm')} • {item.type.toUpperCase()}
+                      {safeFormatTime(item.start, { hour: '2-digit', minute: '2-digit', hour12: false }) || 'Invalid time'} • {item.type.toUpperCase()}
                     </div>
                   </div>
                 </div>
@@ -188,7 +190,10 @@ export default function CalendarView({
 
         <div className="grid grid-cols-7 gap-2">
           {days.map((day, index) => {
-            const dayItems = allItems.filter(item => isSameDay(item.start, day));
+            const dayItems = allItems.filter(item => {
+              const itemStartDate = safeToDate(item.start);
+              return itemStartDate ? isSameDay(itemStartDate, day) : false;
+            });
             const isCurrentDay = isToday(day);
             
             return (
@@ -288,7 +293,10 @@ export default function CalendarView({
             });
             
             return days.map((day, dayIndex) => {
-              const dayItems = allItems.filter(item => isSameDay(item.start, day));
+              const dayItems = allItems.filter(item => {
+                const itemStartDate = safeToDate(item.start);
+                return itemStartDate ? isSameDay(itemStartDate, day) : false;
+              });
               const isCurrentDay = isToday(day);
               const isCurrentMonth = isSameMonth(day, currentDate);
               

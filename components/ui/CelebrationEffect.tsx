@@ -28,14 +28,18 @@ export default function CelebrationEffect({
   const [particles, setParticles] = useState<ConfettiParticle[]>([]);
   
   // Pre-generate sparkle positions to avoid calling Math.random during render
-  const sparklePositions = useMemo(() => {
-    if (typeof window === 'undefined') return [];
-    return Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      delay: Math.random() * 2,
-    }));
+  const [sparklePositions, setSparklePositions] = useState<Array<{id: number; x: number; y: number; delay: number}>>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isActive) {
+      const positions = Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        delay: Math.random() * 2,
+      }));
+      setSparklePositions(positions);
+    }
   }, [isActive]);
 
   useEffect(() => {
