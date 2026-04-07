@@ -5,14 +5,22 @@ import { motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import HabitTracker from '@/components/HabitTracker';
 import TodayPanel from '@/components/TodayPanel';
+import CalendarView from '@/components/Calendar/CalendarView';
 import { mockHabitsData, type Habit } from '@/lib/habitParser';
 import { saveToLocalStorage, loadFromLocalStorage } from '@/lib/utils';
 import { useMobile, useSwipe } from '@/hooks/useMobile';
+import { useCalendar } from '@/hooks/useCalendar';
 
 export default function RetroFuturisticDashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [mounted, setMounted] = useState(false);
   const { isMobile } = useMobile();
+  
+  // Calendar integration
+  const { events, reminders, loading: calendarLoading } = useCalendar({
+    timeMin: new Date(),
+    timeMax: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Next 30 days
+  });
 
   // Load habits from localStorage on mount
   useEffect(() => {
@@ -199,6 +207,20 @@ export default function RetroFuturisticDashboard() {
               onMarkAllComplete={() => {
                 setHabits(prev => prev.map(h => ({ ...h, completed: true })));
               }}
+            />
+          </motion.div>
+
+          {/* Calendar Integration Panel */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="col-span-12"
+          >
+            <CalendarView 
+              habits={habits}
+              events={events}
+              reminders={reminders}
             />
           </motion.div>
 
