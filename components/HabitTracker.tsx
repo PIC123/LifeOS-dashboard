@@ -35,59 +35,70 @@ export default function HabitTracker({ habits, onToggleHabit }: HabitTrackerProp
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="bg-command-surface/30 border border-command-border/40 rounded-lg overflow-hidden"
+      className="bg-command-surface/80 border-2 border-command-primary/20 rounded-lg overflow-hidden"
     >
-      {/* Clean Header */}
-      <div className="px-6 py-3 border-b border-command-border/20">
+      {/* Retro Header Panel */}
+      <div className="px-6 py-4 border-b-2 border-command-primary/20 bg-gradient-to-r from-command-primary/5 to-command-secondary/5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {/* Simple Progress Indicator */}
-            <div className="w-1 h-4 bg-command-primary/60 rounded-full animate-pulse"></div>
+            {/* Circular Status Indicator */}
+            <div className="relative">
+              <div className="w-8 h-8 border-2 border-command-primary/50 rounded-full flex items-center justify-center">
+                <div className="w-3 h-3 bg-command-primary rounded-full animate-pulse"></div>
+              </div>
+            </div>
             
-            {/* Clean Title */}
+            {/* Panel Title */}
             <div className="flex flex-col">
-              <h2 className="font-ultra font-ultra-thin text-base text-command-text tracking-super-wide uppercase leading-none">
-                ROUTINE
+              <h2 className="font-mono text-lg text-command-text tracking-wider">
+                ROUTINE.EXEC
               </h2>
-              <div className="flex items-center gap-2 mt-0.5">
-                <div className="w-8 h-px bg-command-accent/30"></div>
-                <span className="font-ultra font-thin text-xs text-command-accent tracking-ultra-wide uppercase">
-                  EXEC
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-px bg-command-secondary/40"></div>
+                <span className="font-mono text-xs text-command-secondary tracking-wide">
+                  DAILY.PROTOCOL
                 </span>
               </div>
             </div>
           </div>
           
-          {/* Clean Counter */}
-          <div className="text-right">
-            <div className="font-ultra font-thin text-lg text-command-primary tracking-wider">
-              {completedCount}
-            </div>
-            <div className="w-3 h-px bg-command-primary/30 ml-auto mt-0.5"></div>
-            <div className="font-ultra font-ultra-thin text-xs text-command-muted tracking-wide mt-0.5">
-              {habits.length}
+          {/* Status Display */}
+          <div className="bg-command-panel/40 border border-command-border/30 rounded px-3 py-2">
+            <div className="text-center">
+              <div className="font-mono text-lg text-command-primary">
+                {completedCount}/{habits.length}
+              </div>
+              <div className="font-mono text-xs text-command-muted">COMPLETE</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="px-6 py-2 bg-command-background/20">
-        <div className="relative h-1 bg-command-background/50 rounded-full overflow-hidden">
-          <motion.div
-            className="absolute top-0 left-0 h-full bg-gradient-to-r from-command-primary to-command-accent"
-            initial={{ width: 0 }}
-            animate={{ width: `${completionPercentage}%` }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          />
-          {completionPercentage === 100 && (
-            <motion.div
-              className="absolute inset-0 bg-command-primary/20 animate-glow-blue"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            />
-          )}
+      {/* Retro Progress Display */}
+      <div className="px-6 py-3 bg-command-background/30">
+        <div className="flex items-center gap-4">
+          <span className="font-mono text-xs text-command-muted min-w-fit">PROGRESS</span>
+          <div className="flex-1 relative">
+            <div className="h-2 bg-command-background/50 rounded border border-command-border/30 overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-command-primary via-command-secondary to-command-accent"
+                initial={{ width: 0 }}
+                animate={{ width: `${completionPercentage}%` }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              />
+            </div>
+            {completionPercentage === 100 && (
+              <motion.div
+                className="absolute -inset-1 border border-command-accent/50 rounded animate-glow-orange"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              />
+            )}
+          </div>
+          <span className="font-mono text-xs text-command-primary min-w-fit">
+            {Math.round(completionPercentage)}%
+          </span>
         </div>
       </div>
 
@@ -101,22 +112,22 @@ export default function HabitTracker({ habits, onToggleHabit }: HabitTrackerProp
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05, duration: 0.2 }}
               className={cn(
-                "group flex items-center justify-between p-3 rounded-md transition-all duration-200 cursor-pointer",
-                "hover:bg-command-surface/30 border border-transparent",
+                "group flex items-center justify-between p-4 transition-all duration-200 cursor-pointer",
+                "bg-command-panel/20 border border-command-border/20 hover:border-command-primary/40",
                 habit.completed 
-                  ? "bg-command-primary/5 border-command-primary/20" 
-                  : "hover:border-command-border/40"
+                  ? "bg-command-primary/10 border-command-primary/30 shadow-lg shadow-command-primary/10" 
+                  : "hover:bg-command-panel/30"
               )}
               onClick={() => handleToggleHabit(habit.id)}
             >
               <div className="flex items-center gap-3 flex-1">
-                {/* Checkbox */}
+                {/* Retro Checkbox */}
                 <motion.div
                   className={cn(
-                    "relative w-4 h-4 border rounded-sm transition-all duration-200 flex items-center justify-center",
+                    "relative w-5 h-5 border-2 transition-all duration-200 flex items-center justify-center",
                     habit.completed
-                      ? "bg-command-primary border-command-primary"
-                      : "border-command-border group-hover:border-command-primary/50"
+                      ? "bg-command-primary border-command-primary shadow-lg shadow-command-primary/30"
+                      : "border-command-border/50 group-hover:border-command-primary/60"
                   )}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
@@ -135,14 +146,14 @@ export default function HabitTracker({ habits, onToggleHabit }: HabitTrackerProp
                   </AnimatePresence>
                 </motion.div>
 
-                {/* Ultra-thin Habit Name */}
+                {/* Retro Habit Name */}
                 <span className={cn(
-                  "font-ultra font-thin text-sm transition-all duration-200 tracking-wide",
+                  "font-mono text-sm transition-all duration-200 tracking-wide",
                   habit.completed 
                     ? "text-command-text line-through opacity-70" 
                     : "text-command-text group-hover:text-command-primary"
                 )}>
-                  {habit.name}
+                  {habit.name.toUpperCase().replace(/\s/g, '.')}
                 </span>
               </div>
 

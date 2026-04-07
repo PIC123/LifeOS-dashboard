@@ -5,13 +5,17 @@ import { motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import HabitTracker from '@/components/HabitTracker';
 import TodayPanel from '@/components/TodayPanel';
+import ResponsiveLayout, { ResponsiveGrid } from '@/components/ui/ResponsiveLayout';
+import { SystemRocket, StatusOnline, StatusCloud } from '@/components/ui/Icons';
 import { mockHabitsData, type Habit } from '@/lib/habitParser';
 import { saveToLocalStorage, loadFromLocalStorage } from '@/lib/utils';
 import { useMobile, useSwipe } from '@/hooks/useMobile';
+import { SciFiTitle, RotatedLabel, GlowingAccent } from '@/components/ui/PretextDisplay';
 
-export default function RetroFuturisticDashboard() {
+export default function Dashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [currentView, setCurrentView] = useState<'main' | 'habits' | 'today'>('main');
   const { isMobile } = useMobile();
 
   // Load habits from localStorage on mount
@@ -28,6 +32,20 @@ export default function RetroFuturisticDashboard() {
     }
   }, [habits, mounted]);
 
+  // Swipe gestures for mobile navigation
+  useSwipe(
+    () => {
+      // Swipe left - next view
+      if (currentView === 'main') setCurrentView('habits');
+      else if (currentView === 'habits') setCurrentView('today');
+    },
+    () => {
+      // Swipe right - previous view
+      if (currentView === 'today') setCurrentView('habits');
+      else if (currentView === 'habits') setCurrentView('main');
+    }
+  );
+
   const toggleHabit = (habitId: string) => {
     setHabits(prev => 
       prev.map(habit => 
@@ -38,18 +56,15 @@ export default function RetroFuturisticDashboard() {
     );
   };
 
-  const completedCount = habits.filter(h => h.completed).length;
-  const completionPercentage = habits.length > 0 ? (completedCount / habits.length) * 100 : 0;
-
   if (!mounted) {
     return (
       <div className="min-h-screen bg-command-background flex items-center justify-center">
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-command-primary text-xl font-mono"
+          className="text-command-primary text-xl"
         >
-          INITIALIZING.COMMAND.CENTER...
+          Initializing Command Center...
         </motion.div>
       </div>
     );
@@ -169,30 +184,59 @@ export default function RetroFuturisticDashboard() {
         </div>
       </motion.header>
 
-      {/* Retro-Futuristic Dashboard */}
-      <main className="relative p-8">
-        {/* Dashboard Grid */}
-        <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
-          
-          {/* Main Habit Control Panel */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="col-span-12 lg:col-span-8"
-          >
+      {/* Main Dashboard */}
+      <main>
+        <ResponsiveLayout>
+          <ResponsiveGrid>
+            {/* Left Column - Main Habit Tracking */}
+            <div className="lg:col-span-2 space-y-6">
             <HabitTracker 
               habits={habits} 
               onToggleHabit={toggleHabit} 
             />
-          </motion.div>
+            
+            {/* Project Status Panel */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-command-surface/80 backdrop-blur-sm border border-command-border rounded-xl p-6 hover:bg-command-surface transition-all duration-300"
+            >
+              <h2 className="text-xl font-semibold text-command-text mb-4 flex items-center gap-2">
+                <SystemRocket size="md" className="text-command-accent" />
+                Active Projects
+              </h2>
+              <div className="space-y-3">
+                <motion.div 
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className="flex items-center justify-between p-4 bg-command-background/50 rounded-lg border border-command-border/50 hover:border-command-primary/30 transition-all"
+                >
+                  <div>
+                    <div className="text-command-text font-medium">LifeOS Dashboard Pro</div>
+                    <div className="text-sm text-command-muted">Professional command center implementation</div>
+                  </div>
+                  <div className="text-command-secondary font-bold text-lg">95%</div>
+                </motion.div>
+                <motion.div 
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className="flex items-center justify-between p-4 bg-command-background/50 rounded-lg border border-command-border/50 hover:border-command-accent/30 transition-all"
+                >
+                  <div>
+                    <div className="text-command-text font-medium">Morning Routine Optimization</div>
+                    <div className="text-sm text-command-muted">Habit tracking and analytics</div>
+                  </div>
+                  <div className="text-command-accent font-bold text-lg">78%</div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
 
-          {/* Status & Controls Panel */}
+          {/* Right Column - Today Panel & Quick Actions */}
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            className="col-span-12 lg:col-span-4 space-y-6"
+            transition={{ delay: 0.4 }}
+            className="space-y-6"
           >
             <TodayPanel 
               habits={habits}
@@ -201,119 +245,38 @@ export default function RetroFuturisticDashboard() {
               }}
             />
           </motion.div>
-
-          {/* Project Status Display */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="col-span-12 lg:col-span-8 bg-command-surface/80 border-2 border-command-primary/20 rounded-lg p-6"
-          >
-            {/* Panel Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-command-secondary rounded-full animate-pulse"></div>
-                <h2 className="font-mono text-lg text-command-text tracking-wider">ACTIVE.PROJECTS</h2>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-command-accent rounded-full"></div>
-                <span className="font-mono text-xs text-command-muted">STATUS.MONITOR</span>
-              </div>
-            </div>
-
-            {/* Project Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="bg-command-panel/30 border border-command-primary/30 rounded p-4 hover:border-command-primary/60 transition-all"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-sm text-command-text">LIFEOS.DASHBOARD</span>
-                  <div className="text-command-primary font-mono text-sm">95%</div>
-                </div>
-                <div className="w-full bg-command-background/50 rounded-full h-2 mb-2">
-                  <div className="bg-gradient-to-r from-command-primary to-command-accent h-2 rounded-full" style={{width: '95%'}}></div>
-                </div>
-                <div className="text-xs text-command-muted font-mono">PERSONAL.COMMAND.CENTER</div>
-              </motion.div>
-
-              <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="bg-command-panel/30 border border-command-secondary/30 rounded p-4 hover:border-command-secondary/60 transition-all"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-sm text-command-text">HEALTH.ROUTINE</span>
-                  <div className="text-command-secondary font-mono text-sm">67%</div>
-                </div>
-                <div className="w-full bg-command-background/50 rounded-full h-2 mb-2">
-                  <div className="bg-gradient-to-r from-command-secondary to-command-accent h-2 rounded-full" style={{width: '67%'}}></div>
-                </div>
-                <div className="text-xs text-command-muted font-mono">MORNING.OPTIMIZATION</div>
-              </motion.div>
-            </div>
-          </motion.div>
-
-          {/* System Monitor Panel */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.7 }}
-            className="col-span-12 lg:col-span-4 bg-command-surface/80 border-2 border-command-accent/20 rounded-lg p-6"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 bg-command-accent rounded-full animate-glow-orange"></div>
-              <h3 className="font-mono text-lg text-command-text tracking-wider">SYS.MONITOR</h3>
-            </div>
-            
-            {/* Circular Progress Display */}
-            <div className="flex justify-center mb-4">
-              <div className="relative w-24 h-24">
-                <div className="absolute inset-0 border-4 border-command-background rounded-full"></div>
-                <div className="absolute inset-0 border-4 border-command-accent rounded-full"
-                     style={{
-                       background: `conic-gradient(from 0deg, #ffaa00 ${completionPercentage * 3.6}deg, transparent ${completionPercentage * 3.6}deg)`
-                     }}>
-                </div>
-                <div className="absolute inset-2 bg-command-surface rounded-full flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="font-mono text-lg text-command-accent">{Math.round(completionPercentage)}</div>
-                    <div className="font-mono text-xs text-command-muted">%</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2 text-xs font-mono">
-              <div className="flex justify-between">
-                <span className="text-command-muted">TASKS.COMPLETE</span>
-                <span className="text-command-primary">{completedCount}/{habits.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-command-muted">SYS.UPTIME</span>
-                <span className="text-command-secondary">24:07:32</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-command-muted">NET.STATUS</span>
-                <span className="text-command-accent">SYNC.OK</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+          </ResponsiveGrid>
+        </ResponsiveLayout>
 
         {/* Mobile Navigation Hint */}
         {isMobile && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
+            transition={{ delay: 0.6 }}
             className="flex justify-center mt-8"
           >
-            <div className="bg-command-surface/50 border border-command-border/30 rounded-lg px-4 py-2">
-              <span className="font-mono text-xs text-command-muted">SWIPE.NAVIGATION.ENABLED</span>
-            </div>
+            <motion.div
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-command-surface/50 border border-command-border/50"
+            >
+              <div className="text-xs text-command-muted">👆 Swipe left/right to navigate</div>
+            </motion.div>
           </motion.div>
         )}
       </main>
+
+      {/* Footer */}
+      <motion.footer 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="border-t border-command-border bg-command-surface/30 backdrop-blur-sm p-4 mt-12"
+      >
+        <div className="max-w-7xl mx-auto text-center text-command-muted text-sm">
+          LifeOS Command Center • Powered by AI & Coffee • {new Date().getFullYear()}
+        </div>
+      </motion.footer>
     </div>
   );
 }

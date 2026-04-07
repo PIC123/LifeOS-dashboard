@@ -77,35 +77,41 @@ export default function TodayPanel({ habits = [], onMarkAllComplete }: TodayPane
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2, delay: 0.1 }}
-        className="bg-command-surface/20 border border-command-border/30 rounded-lg overflow-hidden"
+        className="bg-command-surface/80 border-2 border-command-secondary/20 rounded-lg overflow-hidden"
       >
-        {/* Clean Status Header */}
-        <div className="px-6 py-3 border-b border-command-border/20">
+        {/* Retro Status Header */}
+        <div className="px-6 py-4 border-b-2 border-command-secondary/20 bg-gradient-to-r from-command-secondary/5 to-command-accent/5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              {/* Simple Status Indicator */}
-              <div className="w-1 h-4 bg-command-accent/60 rounded-full animate-pulse"></div>
+              {/* Hexagonal Status Indicator */}
+              <div className="relative">
+                <div className="w-8 h-8 border-2 border-command-secondary/50 rounded flex items-center justify-center rotate-45">
+                  <div className="w-3 h-3 bg-command-secondary rounded-full animate-pulse"></div>
+                </div>
+              </div>
               
-              {/* Clean Header */}
+              {/* Panel Header */}
               <div className="flex flex-col">
-                <h3 className="font-ultra font-ultra-thin text-base text-command-text tracking-super-wide uppercase leading-none">
-                  STATUS
+                <h3 className="font-mono text-lg text-command-text tracking-wider">
+                  STATUS.TODAY
                 </h3>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <div className="w-8 h-px bg-command-primary/30"></div>
-                  <span className="font-ultra font-thin text-xs text-command-primary tracking-ultra-wide uppercase">
-                    TODAY
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-px bg-command-accent/40"></div>
+                  <span className="font-mono text-xs text-command-accent tracking-wide">
+                    CONTROL.PANEL
                   </span>
                 </div>
               </div>
             </div>
             
-            {/* Clean Date */}
-            <div className="font-ultra font-thin text-sm text-command-primary tracking-wider">
-              {new Date().toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: '2-digit' 
-              }).replace(' ', '.').toUpperCase()}
+            {/* Date Display */}
+            <div className="bg-command-panel/40 border border-command-border/30 rounded px-2 py-1">
+              <div className="font-mono text-sm text-command-secondary tracking-wider">
+                {new Date().toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: '2-digit' 
+                }).replace(' ', '.').toUpperCase()}
+              </div>
             </div>
           </div>
 

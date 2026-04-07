@@ -10,16 +10,18 @@ module.exports = {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
-        // Sci-Fi Minimalist Palette
+        // Cassette Futurism Palette
         command: {
-          primary: '#60a5fa',      // Glowing light blue
-          secondary: '#fb7185',    // Glowing coral/pink
-          accent: '#f97316',       // Bright orange
-          background: '#1a1a1a',   // Dark gray background
-          surface: '#2a2a2a',      // Slightly lighter gray for surfaces
-          text: '#ffffff',         // Pure glowing white
-          muted: '#888888',        // Muted gray
-          border: '#3a3a3a',       // Subtle gray borders
+          primary: '#00ffff',      // Cyan/teal - classic retro-future
+          secondary: '#ff6b35',    // Warm orange - cassette aesthetic  
+          accent: '#ffaa00',       // Amber - instrument panel glow
+          background: '#0a0a0f',   // Deep blue-black space
+          surface: '#1a1a2e',      // Dark blue-gray panels
+          text: '#e0e6ed',         // Cool white
+          muted: '#6b7280',        // Neutral gray
+          border: '#374151',       // Panel borders
+          panel: '#0f172a',        // Panel backgrounds
+          glow: '#00ffff33',       // Cyan glow
         }
       },
       fontFamily: {
@@ -39,20 +41,22 @@ module.exports = {
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'glow-blue': 'glowBlue 2s ease-in-out infinite alternate',
+        'glow-cyan': 'glowCyan 2s ease-in-out infinite alternate',
         'glow-orange': 'glowOrange 2s ease-in-out infinite alternate',
         'fade-in': 'fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         'slide-up': 'slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         'scan': 'scan 3s linear infinite',
         'float': 'float 4s ease-in-out infinite',
+        'rotate': 'rotate 10s linear infinite',
+        'pulse-ring': 'pulseRing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
-        glowBlue: {
+        glowCyan: {
           '0%': { 
-            boxShadow: '0 0 2px rgba(96, 165, 250, 0.3)' 
+            boxShadow: '0 0 5px rgba(0, 255, 255, 0.4)' 
           },
           '100%': { 
-            boxShadow: '0 0 8px rgba(96, 165, 250, 0.5)' 
+            boxShadow: '0 0 15px rgba(0, 255, 255, 0.6), 0 0 25px rgba(0, 255, 255, 0.3)' 
           }
         },
         glowOrange: {
@@ -78,6 +82,24 @@ module.exports = {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-4px)' }
+        },
+        rotate: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' }
+        },
+        pulseRing: {
+          '0%': { 
+            transform: 'scale(1)',
+            opacity: '1'
+          },
+          '50%': { 
+            transform: 'scale(1.05)',
+            opacity: '0.8'
+          },
+          '100%': { 
+            transform: 'scale(1)',
+            opacity: '1'
+          }
         }
       },
       transitionTimingFunction: {
