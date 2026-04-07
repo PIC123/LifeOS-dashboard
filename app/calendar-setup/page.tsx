@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { Suspense } from 'react';
 
-export default function CalendarSetupPage() {
+function CalendarSetupContent() {
   const searchParams = useSearchParams();
   const [authUrl, setAuthUrl] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -163,5 +164,17 @@ export default function CalendarSetupPage() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+export default function CalendarSetupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-command-background text-command-text flex items-center justify-center">
+        <div className="font-mono text-sm text-command-muted">LOADING.CALENDAR.SETUP...</div>
+      </div>
+    }>
+      <CalendarSetupContent />
+    </Suspense>
   );
 }
