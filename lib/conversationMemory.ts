@@ -5,6 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
+// @ts-ignore
 import matter from 'gray-matter';
 
 const MEMORY_PATH = '/home/openclaw/.openclaw/workspace/memory';

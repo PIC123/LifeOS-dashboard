@@ -5,6 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
+// @ts-ignore
 import matter from 'gray-matter';
 
 const ZETTELKASTEN_PATH = '/home/openclaw/.openclaw/workspace/zettelkasten';
