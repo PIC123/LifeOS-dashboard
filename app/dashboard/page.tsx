@@ -45,8 +45,7 @@ export default function PersonalCommandCenter() {
   const { projects, areas, loading: projectsLoading } = useProjects();
   const { tasks, loading: tasksLoading, addTask, updateTask, deleteTask } = useTasks();
 
-  // Derive loading state — no useEffect needed
-  const loading = projectsLoading || tasksLoading;
+  // Note: Knowledge and Memory views load data independently
 
   // Load additional data for focused views
   const loadViewData = useCallback(async (view: DashboardView) => {
@@ -97,12 +96,16 @@ export default function PersonalCommandCenter() {
     memoryDays: data.memory?.stats?.totalDays || 0,
   };
 
-  if (loading) {
+  // Only show loading screen for views that depend on projects/tasks
+  const shouldShowLoading = (projectsLoading && state.currentView === 'projects') || 
+                           (tasksLoading && state.currentView === 'tasks');
+
+  if (shouldShowLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
-          <p className="mt-4 text-cyan-400 font-mono">Loading Command Center...</p>
+          <p className="mt-4 text-cyan-400 font-mono">Loading {state.currentView}...</p>
         </div>
       </div>
     );
