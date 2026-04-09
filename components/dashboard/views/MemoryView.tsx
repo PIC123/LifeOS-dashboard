@@ -27,7 +27,7 @@ interface MemoryStats {
   topTopics: string[];
 }
 
-interface MemoryData {
+export interface MemoryData {
   recentMemories: DailyMemory[];
   insights: ConversationInsight[];
   stats: MemoryStats;

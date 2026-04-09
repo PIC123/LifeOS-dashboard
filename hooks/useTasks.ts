@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Task, TaskFilter, TaskStats } from '@/types/tasks';
 import { saveToLocalStorage, loadFromLocalStorage } from '@/lib/utils';
 
@@ -111,6 +111,8 @@ export function useTasks(): UseTasksReturn {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Tracks whether initial load is done so we don't overwrite localStorage before reading it
+  const initialLoadDone = useRef(false);
 
   // Load tasks on mount
   useEffect(() => {
@@ -121,16 +123,17 @@ export function useTasks(): UseTasksReturn {
       setError('Failed to load tasks');
       setTasks(mockTasks);
     } finally {
+      initialLoadDone.current = true;
       setLoading(false);
     }
   }, []);
 
-  // Save tasks to localStorage whenever tasks change
+  // Save tasks to localStorage whenever tasks change (skip the initial load)
   useEffect(() => {
-    if (!loading && tasks.length > 0) {
+    if (initialLoadDone.current) {
       saveToLocalStorage(STORAGE_KEY, tasks);
     }
-  }, [tasks, loading]);
+  }, [tasks]);
 
   const addTask = useCallback((newTask: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     const task: Task = {

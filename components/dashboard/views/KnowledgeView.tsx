@@ -21,7 +21,7 @@ interface KnowledgeMap {
   lastUpdated: Date;
 }
 
-interface KnowledgeData {
+export interface KnowledgeData {
   recentNotes: AtomicNote[];
   maps: KnowledgeMap[];
   inbox: Array<{title: string, content: string, created: Date}>;

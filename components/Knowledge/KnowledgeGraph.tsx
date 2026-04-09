@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProjectStatus } from '@/lib/paraSystem';
 
@@ -27,13 +27,185 @@ interface KnowledgeGraphProps {
   className?: string;
 }
 
+// Move component definitions outside the main component
+const ViewToggle = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: 'graph' | 'list' | 'timeline') => void }) => (
+  <div className="flex bg-command-panel/30 border border-command-border/30 rounded-lg p-1">
+    {(['graph', 'list', 'timeline'] as const).map((mode) => (
+      <motion.button
+        key={mode}
+        onClick={() => setViewMode(mode)}
+        className={`px-3 py-1 font-mono text-xs tracking-wider uppercase transition-all ${
+          viewMode === mode
+            ? 'bg-command-primary text-command-background'
+            : 'text-command-muted hover:text-command-text'
+        }`}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        {mode}
+      </motion.button>
+    ))}
+  </div>
+);
+
+const GraphView = ({ 
+  nodes, 
+  connections, 
+  selectedNode, 
+  setSelectedNode, 
+  getNodeColor 
+}: {
+  nodes: KnowledgeNode[];
+  connections: KnowledgeConnection[];
+  selectedNode: KnowledgeNode | null;
+  setSelectedNode: (node: KnowledgeNode | null) => void;
+  getNodeColor: (node: KnowledgeNode) => string;
+}) => (
+  <div className="relative w-full h-96 bg-command-panel/10 border border-command-border/20 rounded overflow-hidden">
+    <svg className="w-full h-full">
+      {/* Render connections */}
+      {connections.map((conn, index) => {
+        const fromNode = nodes.find(n => n.id === conn.from);
+        const toNode = nodes.find(n => n.id === conn.to);
+        if (!fromNode || !toNode) return null;
+
+        return (
+          <motion.line
+            key={`${conn.from}-${conn.to}`}
+            x1={fromNode.x}
+            y1={fromNode.y}
+            x2={toNode.x}
+            y2={toNode.y}
+            stroke={conn.type === 'dependency' ? '#ff6b35' : '#00ffff'}
+            strokeWidth={conn.strength * 2}
+            strokeOpacity={0.4}
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ delay: index * 0.1 }}
+          />
+        );
+      })}
+
+      {/* Render nodes */}
+      {nodes.map((node, index) => (
+        <motion.g
+          key={node.id}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: index * 0.05 }}
+        >
+          <motion.circle
+            cx={node.x}
+            cy={node.y}
+            r={node.type === 'project' ? 12 : 8}
+            fill={getNodeColor(node)}
+            stroke={selectedNode?.id === node.id ? '#ffffff' : 'transparent'}
+            strokeWidth={2}
+            className="cursor-pointer"
+            whileHover={{ scale: 1.2 }}
+            onClick={() => setSelectedNode(node)}
+          />
+          <text
+            x={node.x}
+            y={node.y + 25}
+            textAnchor="middle"
+            className="fill-command-text text-xs font-mono"
+            style={{ pointerEvents: 'none' }}
+          >
+            {node.name.split(' ').slice(0, 2).join(' ')}
+          </text>
+        </motion.g>
+      ))}
+    </svg>
+
+    {/* Node details overlay */}
+    <AnimatePresence>
+      {selectedNode && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="absolute top-4 right-4 bg-command-surface/90 border border-command-border/30 rounded-lg p-4 max-w-xs"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-mono text-sm text-command-text font-bold">
+              {selectedNode.name}
+            </h4>
+            <button
+              onClick={() => setSelectedNode(null)}
+              className="text-command-muted hover:text-command-text"
+            >
+              ×
+            </button>
+          </div>
+          <div className="space-y-2">
+            <div className="text-xs font-mono text-command-accent uppercase">
+              {selectedNode.type}
+            </div>
+            <div className="text-xs text-command-muted">
+              {selectedNode.description}
+            </div>
+            <div className="text-xs text-command-primary">
+              Last: {selectedNode.lastAccessed}
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
+
+const ListView = ({ 
+  nodes, 
+  selectedNode, 
+  setSelectedNode, 
+  getNodeColor 
+}: {
+  nodes: KnowledgeNode[];
+  selectedNode: KnowledgeNode | null;
+  setSelectedNode: (node: KnowledgeNode | null) => void;
+  getNodeColor: (node: KnowledgeNode) => string;
+}) => (
+  <div className="space-y-2">
+    {nodes.map((node, index) => (
+      <motion.div
+        key={node.id}
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: index * 0.05 }}
+        className="bg-command-panel/20 border border-command-border/20 rounded p-3 hover:border-command-primary/40 transition-all cursor-pointer"
+        onClick={() => setSelectedNode(node)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div 
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: getNodeColor(node) }}
+            />
+            <div>
+              <div className="font-mono text-sm text-command-text">
+                {node.name}
+              </div>
+              <div className="font-mono text-xs text-command-muted">
+                {node.type.toUpperCase()} • {node.connections.length} connections
+              </div>
+            </div>
+          </div>
+          <div className="font-mono text-xs text-command-primary">
+            {node.lastAccessed?.split('-').slice(1).join('.')}
+          </div>
+        </div>
+      </motion.div>
+    ))}
+  </div>
+);
+
 export default function KnowledgeGraph({ projects = [], className = '' }: KnowledgeGraphProps) {
-  const [nodes, setNodes] = useState<KnowledgeNode[]>([]);
-  const [connections, setConnections] = useState<KnowledgeConnection[]>([]);
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
   const [viewMode, setViewMode] = useState<'graph' | 'list' | 'timeline'>('graph');
 
-  useEffect(() => {
+  // Use useMemo to compute nodes and connections to avoid unnecessary recalculations
+  const nodes = useMemo(() => {
     // Convert projects to knowledge nodes
     const projectNodes: KnowledgeNode[] = projects.map((project, index) => ({
       id: project.id,
@@ -80,21 +252,19 @@ export default function KnowledgeGraph({ projects = [], className = '' }: Knowle
       },
     ];
 
-    setNodes([...projectNodes, ...knowledgeNodes]);
-
-    // Generate connections based on related topics
-    const autoConnections: KnowledgeConnection[] = [
-      { from: 'lifeos-dashboard', to: 'ai-agents', strength: 0.8, type: 'related' },
-      { from: 'portfolio-site', to: 'creative-tech', strength: 0.9, type: 'related' },
-      { from: 'wizard-staff', to: 'festival-prep', strength: 0.7, type: 'dependency' },
-      { from: 'wizard-staff', to: 'creative-tech', strength: 0.6, type: 'related' },
-      { from: 'ai-agents', to: 'creative-tech', strength: 0.4, type: 'reference' },
-    ];
-
-    setConnections(autoConnections);
+    return [...projectNodes, ...knowledgeNodes];
   }, [projects]);
 
-  const getNodeColor = (node: KnowledgeNode): string => {
+  const connections = useMemo<KnowledgeConnection[]>(() => [
+    { from: 'lifeos-dashboard', to: 'ai-agents', strength: 0.8, type: 'related' },
+    { from: 'portfolio-site', to: 'creative-tech', strength: 0.9, type: 'related' },
+    { from: 'wizard-staff', to: 'festival-prep', strength: 0.7, type: 'dependency' },
+    { from: 'wizard-staff', to: 'creative-tech', strength: 0.6, type: 'related' },
+    { from: 'ai-agents', to: 'creative-tech', strength: 0.4, type: 'reference' },
+  ], []);
+
+  // Use useCallback to memoize functions that are passed to child components
+  const getNodeColor = useCallback((node: KnowledgeNode): string => {
     switch (node.type) {
       case 'project': return '#00ffff';
       case 'area': return '#ff6b35';
@@ -103,157 +273,15 @@ export default function KnowledgeGraph({ projects = [], className = '' }: Knowle
       case 'note': return '#00ffff';
       default: return '#ffffff';
     }
-  };
+  }, []);
 
-  const GraphView = () => (
-    <div className="relative w-full h-96 bg-command-panel/10 border border-command-border/20 rounded overflow-hidden">
-      <svg className="w-full h-full">
-        {/* Render connections */}
-        {connections.map((conn, index) => {
-          const fromNode = nodes.find(n => n.id === conn.from);
-          const toNode = nodes.find(n => n.id === conn.to);
-          if (!fromNode || !toNode) return null;
+  const handleNodeSelection = useCallback((node: KnowledgeNode | null) => {
+    setSelectedNode(node);
+  }, []);
 
-          return (
-            <motion.line
-              key={`${conn.from}-${conn.to}`}
-              x1={fromNode.x}
-              y1={fromNode.y}
-              x2={toNode.x}
-              y2={toNode.y}
-              stroke={conn.type === 'dependency' ? '#ff6b35' : '#00ffff'}
-              strokeWidth={conn.strength * 2}
-              strokeOpacity={0.4}
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: index * 0.1 }}
-            />
-          );
-        })}
-
-        {/* Render nodes */}
-        {nodes.map((node, index) => (
-          <motion.g
-            key={node.id}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <motion.circle
-              cx={node.x}
-              cy={node.y}
-              r={node.type === 'project' ? 12 : 8}
-              fill={getNodeColor(node)}
-              stroke={selectedNode?.id === node.id ? '#ffffff' : 'transparent'}
-              strokeWidth={2}
-              className="cursor-pointer"
-              whileHover={{ scale: 1.2 }}
-              onClick={() => setSelectedNode(node)}
-            />
-            <text
-              x={node.x}
-              y={node.y + 25}
-              textAnchor="middle"
-              className="fill-command-text text-xs font-mono"
-              style={{ pointerEvents: 'none' }}
-            >
-              {node.name.split(' ').slice(0, 2).join(' ')}
-            </text>
-          </motion.g>
-        ))}
-      </svg>
-
-      {/* Node details overlay */}
-      <AnimatePresence>
-        {selectedNode && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute top-4 right-4 bg-command-surface/90 border border-command-border/30 rounded-lg p-4 max-w-xs"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-mono text-sm text-command-text font-bold">
-                {selectedNode.name}
-              </h4>
-              <button
-                onClick={() => setSelectedNode(null)}
-                className="text-command-muted hover:text-command-text"
-              >
-                ×
-              </button>
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs font-mono text-command-accent uppercase">
-                {selectedNode.type}
-              </div>
-              <div className="text-xs text-command-muted">
-                {selectedNode.description}
-              </div>
-              <div className="text-xs text-command-primary">
-                Last: {selectedNode.lastAccessed}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-
-  const ListView = () => (
-    <div className="space-y-2">
-      {nodes.map((node, index) => (
-        <motion.div
-          key={node.id}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.05 }}
-          className="bg-command-panel/20 border border-command-border/20 rounded p-3 hover:border-command-primary/40 transition-all cursor-pointer"
-          onClick={() => setSelectedNode(node)}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div 
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: getNodeColor(node) }}
-              />
-              <div>
-                <div className="font-mono text-sm text-command-text">
-                  {node.name}
-                </div>
-                <div className="font-mono text-xs text-command-muted">
-                  {node.type.toUpperCase()} • {node.connections.length} connections
-                </div>
-              </div>
-            </div>
-            <div className="font-mono text-xs text-command-primary">
-              {node.lastAccessed?.split('-').slice(1).join('.')}
-            </div>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  );
-
-  const ViewToggle = () => (
-    <div className="flex bg-command-panel/30 border border-command-border/30 rounded-lg p-1">
-      {(['graph', 'list', 'timeline'] as const).map((mode) => (
-        <motion.button
-          key={mode}
-          onClick={() => setViewMode(mode)}
-          className={`px-3 py-1 font-mono text-xs tracking-wider uppercase transition-all ${
-            viewMode === mode
-              ? 'bg-command-primary text-command-background'
-              : 'text-command-muted hover:text-command-text'
-          }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          {mode}
-        </motion.button>
-      ))}
-    </div>
-  );
+  const handleViewModeChange = useCallback((mode: 'graph' | 'list' | 'timeline') => {
+    setViewMode(mode);
+  }, []);
 
   return (
     <motion.div 
@@ -269,7 +297,7 @@ export default function KnowledgeGraph({ projects = [], className = '' }: Knowle
             KNOWLEDGE.GRAPH
           </h2>
         </div>
-        <ViewToggle />
+        <ViewToggle viewMode={viewMode} setViewMode={handleViewModeChange} />
       </div>
 
       {/* Content */}
@@ -281,8 +309,23 @@ export default function KnowledgeGraph({ projects = [], className = '' }: Knowle
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.2 }}
         >
-          {viewMode === 'graph' && <GraphView />}
-          {viewMode === 'list' && <ListView />}
+          {viewMode === 'graph' && (
+            <GraphView 
+              nodes={nodes}
+              connections={connections}
+              selectedNode={selectedNode}
+              setSelectedNode={handleNodeSelection}
+              getNodeColor={getNodeColor}
+            />
+          )}
+          {viewMode === 'list' && (
+            <ListView 
+              nodes={nodes}
+              selectedNode={selectedNode}
+              setSelectedNode={handleNodeSelection}
+              getNodeColor={getNodeColor}
+            />
+          )}
           {viewMode === 'timeline' && (
             <div className="text-center py-8 text-command-muted font-mono text-sm">
               TIMELINE.VIEW.COMING.SOON

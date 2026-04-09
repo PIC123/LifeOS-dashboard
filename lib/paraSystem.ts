@@ -14,10 +14,12 @@ export interface ProjectEntity {
   facts: ProjectFact[];
 }
 
+export type ProjectStatusValue = 'ACTIVE' | 'COMPLETE' | 'PLANNING' | 'PAUSED';
+
 export interface ProjectStatus {
   id: string;
   name: string;
-  status: string;
+  status: ProjectStatusValue;
   progress: number;
   description: string;
   lastUpdated: string;
@@ -113,7 +115,7 @@ class ParaSystemService {
       .join(' ');
   }
   
-  private extractStatus(entity: ProjectEntity | null, readme: string): string {
+  private extractStatus(entity: ProjectEntity | null, readme: string): ProjectStatusValue {
     // Look for status in facts
     const statusFact = entity?.facts?.find(fact => 
       fact.fact.toLowerCase().includes('status') ||

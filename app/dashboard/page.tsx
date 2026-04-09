@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 
@@ -8,11 +8,12 @@ import { Toaster } from 'react-hot-toast';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import DashboardStats from '@/components/dashboard/DashboardStats';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // New focused views
 import ProjectsView from '@/components/dashboard/views/ProjectsView';
-import KnowledgeView from '@/components/dashboard/views/KnowledgeView';
-import MemoryView from '@/components/dashboard/views/MemoryView';
+import KnowledgeView, { type KnowledgeData } from '@/components/dashboard/views/KnowledgeView';
+import MemoryView, { type MemoryData } from '@/components/dashboard/views/MemoryView';
 import TasksView from '@/components/dashboard/views/TasksView';
 
 // Hooks (simplified)
@@ -25,63 +26,60 @@ export type DashboardView = 'projects' | 'knowledge' | 'memory' | 'tasks';
 interface DashboardState {
   currentView: DashboardView;
   sidebarCollapsed: boolean;
-  loading: boolean;
 }
 
 interface DashboardData {
-  projects?: any;
-  knowledge?: any;
-  memory?: any;
-  tasks?: any;
+  knowledge?: KnowledgeData;
+  memory?: MemoryData;
 }
 
 export default function PersonalCommandCenter() {
   const [state, setState] = useState<DashboardState>({
     currentView: 'projects',
     sidebarCollapsed: false,
-    loading: true,
   });
 
   const [data, setData] = useState<DashboardData>({});
 
   // Simplified data loading - only essential systems
   const { projects, areas, loading: projectsLoading } = useProjects();
-  const { tasks, stats: taskStats, loading: tasksLoading } = useTasks();
+  const { tasks, loading: tasksLoading, addTask, updateTask, deleteTask } = useTasks();
+
+  // Derive loading state — no useEffect needed
+  const loading = projectsLoading || tasksLoading;
 
   // Load additional data for focused views
-  const loadViewData = async (view: DashboardView) => {
+  const loadViewData = useCallback(async (view: DashboardView) => {
     try {
       switch (view) {
         case 'knowledge':
           if (!data.knowledge) {
             const response = await fetch('/api/zettelkasten?view=overview');
             const result = await response.json();
-            setData(prev => ({ ...prev, knowledge: result }));
+            if (result.success !== false) {
+              setData(prev => ({ ...prev, knowledge: result }));
+            }
           }
           break;
         case 'memory':
           if (!data.memory) {
             const response = await fetch('/api/memory?view=overview');
             const result = await response.json();
-            setData(prev => ({ ...prev, memory: result }));
+            if (result.success !== false) {
+              setData(prev => ({ ...prev, memory: result }));
+            }
           }
           break;
       }
     } catch (error) {
       console.error(`Error loading ${view} data:`, error);
     }
-  };
-
-  // Update loading state
-  useEffect(() => {
-    const allLoaded = !projectsLoading && !tasksLoading;
-    setState(prev => ({ ...prev, loading: !allLoaded }));
-  }, [projectsLoading, tasksLoading]);
+  }, [data.knowledge, data.memory]);
 
   // Load data when view changes
   useEffect(() => {
     loadViewData(state.currentView);
-  }, [state.currentView]);
+  }, [state.currentView, loadViewData]);
 
   const handleViewChange = (view: DashboardView) => {
     setState(prev => ({ ...prev, currentView: view }));
@@ -93,13 +91,13 @@ export default function PersonalCommandCenter() {
 
   // Calculate stats for sidebar
   const sidebarStats = {
-    activeProjects: projects?.filter((p: any) => p.status === 'active')?.length || 0,
-    totalTasks: taskStats?.totalTasks || 0,
+    activeProjects: projects?.filter(p => p.status === 'ACTIVE')?.length || 0,
+    totalTasks: tasks?.length || 0,
     recentNotes: data.knowledge?.stats?.totalNotes || 0,
     memoryDays: data.memory?.stats?.totalDays || 0,
   };
 
-  if (state.loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
@@ -147,12 +145,14 @@ export default function PersonalCommandCenter() {
         }`}>
           <div className="p-6">
             {/* Stats Overview */}
-            <DashboardStats 
-              projects={projects}
-              tasks={tasks}
-              knowledge={data.knowledge}
-              memory={data.memory}
-            />
+            <ErrorBoundary variant="view" name="Stats">
+              <DashboardStats
+                projects={projects}
+                tasks={tasks}
+                knowledge={data.knowledge}
+                memory={data.memory}
+              />
+            </ErrorBoundary>
 
             {/* View Content */}
             <AnimatePresence mode="wait">
@@ -165,16 +165,38 @@ export default function PersonalCommandCenter() {
                 className="mt-6"
               >
                 {state.currentView === 'projects' && (
-                  <ProjectsView projects={projects} areas={areas} />
+                  <ErrorBoundary variant="view" name="Projects">
+                    <ProjectsView
+                      projects={projects}
+                      areas={areas}
+                      tasks={tasks}
+                      onAddTask={addTask}
+                      onUpdateTask={updateTask}
+                      onDeleteTask={deleteTask}
+                    />
+                  </ErrorBoundary>
                 )}
                 {state.currentView === 'knowledge' && (
-                  <KnowledgeView data={data.knowledge} />
+                  <ErrorBoundary variant="view" name="Knowledge">
+                    <KnowledgeView data={data.knowledge} />
+                  </ErrorBoundary>
                 )}
                 {state.currentView === 'memory' && (
-                  <MemoryView data={data.memory} />
+                  <ErrorBoundary variant="view" name="Memory">
+                    <MemoryView data={data.memory} />
+                  </ErrorBoundary>
                 )}
                 {state.currentView === 'tasks' && (
-                  <TasksView tasks={tasks} stats={taskStats} />
+                  <ErrorBoundary variant="view" name="Tasks">
+                    <TasksView
+                      tasks={tasks}
+                      projects={projects}
+                      areas={areas}
+                      onAddTask={addTask}
+                      onUpdateTask={updateTask}
+                      onDeleteTask={deleteTask}
+                    />
+                  </ErrorBoundary>
                 )}
               </motion.div>
             </AnimatePresence>

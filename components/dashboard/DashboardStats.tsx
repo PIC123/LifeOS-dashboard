@@ -1,21 +1,37 @@
 'use client';
 
-import { FolderOpen, CheckSquare, Brain, MessageSquare, TrendingUp, Users } from 'lucide-react';
+import { FolderOpen, CheckSquare, Brain, MessageSquare } from 'lucide-react';
+import type { ProjectStatus } from '@/lib/paraSystem';
+import type { Task } from '@/types/tasks';
+
+interface KnowledgeData {
+  stats?: {
+    totalNotes?: number;
+    totalMaps?: number;
+  };
+}
+
+interface MemoryData {
+  stats?: {
+    totalDays?: number;
+    totalInsights?: number;
+  };
+}
 
 interface DashboardStatsProps {
-  projects?: any[];
-  tasks?: any[];
-  knowledge?: any;
-  memory?: any;
+  projects?: ProjectStatus[];
+  tasks?: Task[];
+  knowledge?: KnowledgeData;
+  memory?: MemoryData;
 }
 
 export default function DashboardStats({ projects, tasks, knowledge, memory }: DashboardStatsProps) {
   // Calculate project stats
-  const activeProjects = projects?.filter(p => p.status === 'active').length || 0;
+  const activeProjects = projects?.filter(p => p.status === 'ACTIVE').length || 0;
   const totalProjects = projects?.length || 0;
-  
+
   // Task stats
-  const completedTasks = tasks?.filter((t: any) => t.status === 'completed').length || 0;
+  const completedTasks = tasks?.filter(t => t.status === 'completed').length || 0;
   const totalTasks = tasks?.length || 0;
   
   // Knowledge stats
