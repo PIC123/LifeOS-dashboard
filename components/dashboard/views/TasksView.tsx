@@ -108,7 +108,7 @@ export default function TasksView({
   const filterCounts = getFilterCounts();
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -116,15 +116,15 @@ export default function TasksView({
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-mono font-bold text-command-text mb-2">
+          <h1 className="text-xl md:text-2xl font-mono font-bold text-command-text mb-2">
             TASK.MANAGEMENT
           </h1>
-          <p className="text-command-muted text-sm">
+          <p className="text-command-muted text-sm hidden sm:block">
             Complete task overview and management
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3 w-full sm:w-auto">
           {/* View Mode Toggle */}
           <div className="flex items-center gap-1 bg-command-panel/30 border border-command-border/30 rounded-lg p-1">
             {[
@@ -135,10 +135,10 @@ export default function TasksView({
               <button
                 key={mode}
                 onClick={() => setViewMode(mode as ViewMode)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-xs font-mono rounded transition-all ${
+                className={`flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 text-xs font-mono rounded transition-all touch-manipulation ${
                   viewMode === mode
                     ? 'bg-command-primary/20 text-command-primary border border-command-primary/30'
-                    : 'text-command-muted hover:text-command-text'
+                    : 'text-command-muted hover:text-command-text active:bg-command-primary/10'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -149,7 +149,7 @@ export default function TasksView({
 
           <button
             onClick={() => setShowQuickAdd(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-command-primary/10 border border-command-primary/30 rounded-lg text-command-primary hover:bg-command-primary/20 transition-all group"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-command-primary/10 border border-command-primary/30 rounded-lg text-command-primary hover:bg-command-primary/20 active:bg-command-primary/30 transition-all group touch-manipulation min-h-[44px]"
           >
             <PlusIcon className="w-4 h-4 group-hover:rotate-90 transition-transform" />
             <span className="font-mono text-sm">NEW.TASK</span>

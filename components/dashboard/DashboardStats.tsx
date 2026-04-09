@@ -84,19 +84,19 @@ export default function DashboardStats({ projects, tasks, knowledge, memory }: D
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
       {statItems.map((stat) => {
         const Icon = stat.icon;
         
         return (
           <div
             key={stat.label}
-            className={`${stat.bgColor} rounded-lg border ${stat.borderColor} p-4 transition-all hover:shadow-lg hover:scale-[1.02]`}
+            className={`${stat.bgColor} rounded-lg border ${stat.borderColor} p-3 md:p-4 transition-all hover:shadow-lg hover:scale-[1.02] touch-manipulation`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <Icon className={`h-5 w-5 ${stat.color}`} />
+            <div className="flex items-center justify-between mb-2 md:mb-3">
+              <Icon className={`h-4 w-4 md:h-5 md:w-5 ${stat.color}`} />
               <div className="text-right">
-                <div className={`text-2xl font-bold text-white`}>
+                <div className={`text-lg md:text-2xl font-bold text-white`}>
                   {stat.value}
                 </div>
                 {stat.total !== undefined && stat.total !== stat.value && (
@@ -108,18 +108,18 @@ export default function DashboardStats({ projects, tasks, knowledge, memory }: D
             </div>
             
             <div className="space-y-1">
-              <p className={`font-semibold ${stat.color}`}>{stat.label}</p>
+              <p className={`text-sm md:text-base font-semibold ${stat.color} leading-tight`}>{stat.label}</p>
               {stat.suffix && (
-                <p className="text-xs text-zinc-400">{stat.suffix}</p>
+                <p className="text-xs text-zinc-400 hidden sm:block">{stat.suffix}</p>
               )}
             </div>
 
             {/* Progress bar for some stats */}
             {stat.total !== undefined && stat.total > 0 && (
-              <div className="mt-3">
-                <div className="w-full bg-zinc-800 rounded-full h-1.5">
+              <div className="mt-2 md:mt-3">
+                <div className="w-full bg-zinc-800 rounded-full h-1 md:h-1.5">
                   <div
-                    className={`h-1.5 rounded-full transition-all duration-500 ${stat.color.replace('text-', 'bg-')}`}
+                    className={`h-1 md:h-1.5 rounded-full transition-all duration-500 ${stat.color.replace('text-', 'bg-')}`}
                     style={{
                       width: `${Math.min((stat.value / stat.total) * 100, 100)}%`,
                     }}

@@ -42,11 +42,11 @@ export default function KnowledgeView({ data }: KnowledgeViewProps) {
 
   if (!data) {
     return (
-      <div className="space-y-6">
-        <div className="bg-zinc-900 rounded-lg border border-cyan-400/20 p-6 text-center">
-          <Brain className="mx-auto h-12 w-12 text-cyan-400 mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">Loading Zettelkasten...</h3>
-          <p className="text-zinc-400">Connecting to your knowledge system</p>
+      <div className="space-y-4 md:space-y-6">
+        <div className="bg-zinc-900 rounded-lg border border-cyan-400/20 p-4 md:p-6 text-center">
+          <Brain className="mx-auto h-8 w-8 md:h-12 md:w-12 text-cyan-400 mb-4" />
+          <h3 className="text-lg md:text-xl font-bold text-white mb-2">Loading Zettelkasten...</h3>
+          <p className="text-sm md:text-base text-zinc-400">Connecting to your knowledge system</p>
         </div>
       </div>
     );
@@ -125,7 +125,7 @@ export default function KnowledgeView({ data }: KnowledgeViewProps) {
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id as any)}
+              onClick={() => setActiveTab(id as 'notes' | 'maps' | 'inbox')}
               className={`group inline-flex items-center py-3 md:py-4 px-2 md:px-1 border-b-2 font-medium text-sm whitespace-nowrap touch-manipulation min-h-[44px] ${
                 activeTab === id
                   ? 'border-cyan-400 text-cyan-400'

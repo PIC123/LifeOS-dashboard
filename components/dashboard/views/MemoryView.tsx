@@ -156,7 +156,7 @@ export default function MemoryView({ data }: MemoryViewProps) {
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id as any)}
+              onClick={() => setActiveTab(id as 'recent' | 'insights' | 'search' | 'patterns')}
               className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === id
                   ? 'border-cyan-400 text-cyan-400'

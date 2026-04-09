@@ -91,27 +91,27 @@ export default function ProjectsView({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => setSelectedProject(selectedProject === item.id ? null : item.id)}
-        className={`relative bg-command-surface/40 border rounded-lg p-4 cursor-pointer transition-all ${
+        className={`relative bg-command-surface/40 border rounded-lg p-3 md:p-4 cursor-pointer transition-all touch-manipulation ${
           selectedProject === item.id
             ? `border-${getStatusColor(item.status)}/50 bg-${getStatusColor(item.status)}/10`
-            : 'border-command-border/30 hover:border-command-primary/30'
+            : 'border-command-border/30 hover:border-command-primary/30 active:border-command-primary/50'
         }`}
       >
         {/* Header */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 bg-${getStatusColor(item.status)}/10 rounded-lg`}>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 space-y-3 sm:space-y-0">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className={`p-1.5 md:p-2 bg-${getStatusColor(item.status)}/10 rounded-lg`}>
               {item.type === 'project' ? (
-                <RectangleStackIcon className={`w-5 h-5 text-${getStatusColor(item.status)}`} />
+                <RectangleStackIcon className={`w-4 h-4 md:w-5 md:h-5 text-${getStatusColor(item.status)}`} />
               ) : (
-                <FolderIcon className={`w-5 h-5 text-${getStatusColor(item.status)}`} />
+                <FolderIcon className={`w-4 h-4 md:w-5 md:h-5 text-${getStatusColor(item.status)}`} />
               )}
             </div>
-            <div>
-              <h3 className="font-mono text-sm font-medium text-command-text">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-mono text-sm md:text-base font-medium text-command-text truncate">
                 {item.name}
               </h3>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-1 md:gap-2 mt-1 flex-wrap">
                 <span className={`px-2 py-0.5 text-xs font-mono rounded bg-${getStatusColor(item.status)}/10 text-${getStatusColor(item.status)}`}>
                   {item.status}
                 </span>
@@ -122,8 +122,8 @@ export default function ProjectsView({
             </div>
           </div>
 
-          <div className="text-right">
-            <div className={`text-lg font-mono font-bold text-${getStatusColor(item.status)}`}>
+          <div className="text-right sm:text-right">
+            <div className={`text-lg md:text-xl font-mono font-bold text-${getStatusColor(item.status)}`}>
               {item.progress}%
             </div>
             <div className="text-xs text-command-muted">complete</div>
@@ -180,33 +180,33 @@ export default function ProjectsView({
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
+        className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0"
       >
         <div>
-          <h1 className="text-2xl font-mono font-bold text-command-text mb-2">
+          <h1 className="text-xl md:text-2xl font-mono font-bold text-command-text mb-2">
             PARA.PROJECTS
           </h1>
-          <p className="text-command-muted text-sm">
+          <p className="text-command-muted text-sm hidden sm:block">
             Projects, Areas, Resources & Archives
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3">
           {/* View Mode Toggle */}
           <div className="flex items-center gap-1 bg-command-panel/30 border border-command-border/30 rounded-lg p-1">
             {(['grid', 'kanban', 'list'] as ViewMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setViewMode(mode)}
-                className={`px-3 py-1.5 text-xs font-mono rounded transition-all ${
+                className={`px-2 md:px-3 py-1.5 text-xs font-mono rounded transition-all touch-manipulation ${
                   viewMode === mode
                     ? 'bg-command-primary/20 text-command-primary'
-                    : 'text-command-muted hover:text-command-text'
+                    : 'text-command-muted hover:text-command-text active:bg-command-primary/10'
                 }`}
               >
                 {mode.toUpperCase()}
@@ -216,7 +216,7 @@ export default function ProjectsView({
 
           <button
             onClick={() => setShowQuickAdd(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-command-primary/10 border border-command-primary/30 rounded-lg text-command-primary hover:bg-command-primary/20 transition-all group"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-command-primary/10 border border-command-primary/30 rounded-lg text-command-primary hover:bg-command-primary/20 active:bg-command-primary/30 transition-all group touch-manipulation min-h-[44px]"
           >
             <PlusIcon className="w-4 h-4 group-hover:rotate-90 transition-transform" />
             <span className="font-mono text-sm">NEW.TASK</span>
@@ -229,22 +229,22 @@ export default function ProjectsView({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="flex items-center gap-4"
+        className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
       >
         <div className="flex items-center gap-2">
           <FunnelIcon className="w-4 h-4 text-command-muted" />
           <span className="text-xs font-mono text-command-muted">FILTER:</span>
         </div>
         
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-1 overflow-x-auto scrollbar-hide">
           {(['all', 'projects', 'areas', 'active', 'paused'] as FilterType[]).map((filterType) => (
             <button
               key={filterType}
               onClick={() => setFilter(filterType)}
-              className={`px-3 py-1 text-xs font-mono rounded transition-all ${
+              className={`px-2 md:px-3 py-1.5 text-xs font-mono rounded transition-all whitespace-nowrap touch-manipulation ${
                 filter === filterType
                   ? 'bg-command-accent/20 text-command-accent'
-                  : 'text-command-muted hover:text-command-text hover:bg-command-panel/20'
+                  : 'text-command-muted hover:text-command-text hover:bg-command-panel/20 active:bg-command-accent/10'
               }`}
             >
               {filterType.toUpperCase()}
@@ -254,16 +254,16 @@ export default function ProjectsView({
       </motion.div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
         {/* Projects Grid */}
-        <div className="lg:col-span-2">
+        <div className="xl:col-span-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
             {viewMode === 'grid' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
                 <AnimatePresence mode="popLayout">
                   {filteredItems.map((item, index) => (
                     <motion.div
