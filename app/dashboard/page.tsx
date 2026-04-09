@@ -160,7 +160,7 @@ export default function PersonalCommandCenter() {
     } else {
       console.log(`⚠️ Running in server context - skipping data load`);
     }
-  }, [state.currentView, loadViewData]);
+  }, [state.currentView]); // Removed loadViewData from deps since it's stable (empty deps)
 
 
 
