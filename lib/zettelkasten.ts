@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const ZETTELKASTEN_PATH = '/home/openclaw/.openclaw/workspace/zettelkasten';
+const ZETTELKASTEN_PATH = '/home/openclaw/.openclaw/workspace/phil-brain/zettelkasten';
 
 export interface AtomicNote {
   id: string;

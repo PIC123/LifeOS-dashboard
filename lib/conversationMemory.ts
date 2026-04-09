@@ -6,8 +6,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const MEMORY_PATH = '/home/openclaw/.openclaw/workspace/memory';
-const MEMORY_FILE = '/home/openclaw/.openclaw/workspace/MEMORY.md';
+const MEMORY_PATH = '/home/openclaw/.openclaw/workspace/phil-brain/memory/daily';
+const MEMORY_FILE = '/home/openclaw/.openclaw/workspace/phil-brain/memory/MEMORY.md';
 
 export interface DailyMemory {
   date: string;

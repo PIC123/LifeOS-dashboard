@@ -34,54 +34,139 @@ interface DashboardData {
 }
 
 export default function PersonalCommandCenter() {
+  console.log(`🎬 PersonalCommandCenter component started`);
+  
   const [state, setState] = useState<DashboardState>({
-    currentView: 'projects',
+    currentView: 'knowledge',
     sidebarCollapsed: false,
   });
+  
+  console.log(`🎭 Component state initialized:`, state);
 
   const [data, setData] = useState<DashboardData>({});
+
+  // Debug logging for state changes
+  useEffect(() => {
+    console.log(`🔄 Data state changed:`, {
+      hasKnowledge: !!data.knowledge,
+      hasMemory: !!data.memory,
+      knowledgeStats: data.knowledge?.stats,
+      memoryStats: data.memory?.stats
+    });
+  }, [data]);
 
   // Simplified data loading - only essential systems
   const { projects, areas, loading: projectsLoading } = useProjects();
   const { tasks, loading: tasksLoading, addTask, updateTask, deleteTask } = useTasks();
+  
+  console.log(`⏳ Hook loading states:`, {
+    projectsLoading,
+    tasksLoading,
+    currentView: state.currentView
+  });
 
   // Note: Knowledge and Memory views load data independently
 
   // Load additional data for focused views
   const loadViewData = useCallback(async (view: DashboardView) => {
+    console.log(`🔄 loadViewData called for view: ${view}`);
+    
+    const baseUrl = typeof window === 'undefined' ? 'http://localhost:3000' : '';
+    
     try {
       switch (view) {
         case 'knowledge':
-          if (!data.knowledge) {
-            const response = await fetch('/api/zettelkasten?view=overview');
-            const result = await response.json();
-            if (result.success !== false) {
-              setData(prev => ({ ...prev, knowledge: result }));
-            }
+          console.log(`🌐 Fetching knowledge data from /api/zettelkasten?view=overview`);
+          const response = await fetch(`${baseUrl}/api/zettelkasten?view=overview`);
+          console.log(`📡 Knowledge API response status: ${response.status}`);
+          
+          if (!response.ok) {
+            console.error(`❌ Knowledge API error: ${response.status} ${response.statusText}`);
+            return;
+          }
+          
+          const result = await response.json();
+          console.log(`📥 Knowledge API result structure:`, {
+            success: result.success,
+            hasRecentNotes: !!result.recentNotes,
+            hasMaps: !!result.maps,
+            hasInbox: !!result.inbox,
+            hasStats: !!result.stats,
+            noteCount: result.recentNotes?.length,
+            mapCount: result.maps?.length,
+            inboxCount: result.inbox?.length
+          });
+          
+          if (result.success !== false) {
+            console.log(`💾 Setting knowledge data in state`);
+            setData(prev => {
+              const newState = { ...prev, knowledge: result };
+              console.log(`🔄 New state after knowledge update - knowledge exists: ${!!newState.knowledge}`);
+              return newState;
+            });
+          } else {
+            console.warn(`⚠️ Knowledge API returned success: false`);
           }
           break;
         case 'memory':
-          if (!data.memory) {
-            const response = await fetch('/api/memory?view=overview');
-            const result = await response.json();
-            if (result.success !== false) {
-              setData(prev => ({ ...prev, memory: result }));
-            }
+          console.log(`🌐 Fetching memory data from /api/memory?view=overview`);
+          const memResponse = await fetch(`${baseUrl}/api/memory?view=overview`);
+          console.log(`📡 Memory API response status: ${memResponse.status}`);
+          
+          if (!memResponse.ok) {
+            console.error(`❌ Memory API error: ${memResponse.status} ${memResponse.statusText}`);
+            return;
+          }
+          
+          const memResult = await memResponse.json();
+          console.log(`📥 Memory API result structure:`, {
+            success: memResult.success,
+            hasRecentMemories: !!memResult.recentMemories,
+            hasInsights: !!memResult.insights,
+            hasStats: !!memResult.stats,
+            memoriesCount: memResult.recentMemories?.length,
+            insightsCount: memResult.insights?.length
+          });
+          
+          if (memResult.success !== false) {
+            console.log(`💾 Setting memory data in state`);
+            setData(prev => {
+              const newState = { ...prev, memory: memResult };
+              console.log(`🔄 New state after memory update - memory exists: ${!!newState.memory}`);
+              return newState;
+            });
+          } else {
+            console.warn(`⚠️ Memory API returned success: false`);
           }
           break;
+        default:
+          console.log(`ℹ️ No data loading needed for view: ${view}`);
       }
     } catch (error) {
-      console.error(`Error loading ${view} data:`, error);
+      console.error(`💥 Error loading ${view} data:`, error);
     }
-  }, [data.knowledge, data.memory]);
+  }, []);
 
-  // Load data when view changes
+  console.log(`📍 useEffect setup ready`);
+
+  // Load data on mount and view change
   useEffect(() => {
-    loadViewData(state.currentView);
-  }, [state.currentView, loadViewData]);
+    console.log(`🚀 useEffect triggered for view: ${state.currentView}`);
+    if (typeof window !== 'undefined') {
+      console.log(`✅ Running in browser context`);
+      loadViewData(state.currentView);
+    } else {
+      console.log(`⚠️ Running in server context - skipping data load`);
+    }
+  }, [state.currentView]);
 
   const handleViewChange = (view: DashboardView) => {
-    setState(prev => ({ ...prev, currentView: view }));
+    console.log(`🔄 View change requested: ${state.currentView} → ${view}`);
+    setState(prev => {
+      const newState = { ...prev, currentView: view };
+      console.log(`🎯 New state after view change:`, newState);
+      return newState;
+    });
   };
 
   const toggleSidebar = () => {
@@ -100,7 +185,15 @@ export default function PersonalCommandCenter() {
   const shouldShowLoading = (projectsLoading && state.currentView === 'projects') || 
                            (tasksLoading && state.currentView === 'tasks');
 
+  console.log(`🔍 Loading check:`, {
+    shouldShowLoading,
+    projectsLoading,
+    tasksLoading,
+    currentView: state.currentView
+  });
+
   if (shouldShowLoading) {
+    console.log(`⏸️ Returning early due to loading state`);
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
@@ -181,12 +274,28 @@ export default function PersonalCommandCenter() {
                 )}
                 {state.currentView === 'knowledge' && (
                   <ErrorBoundary variant="view" name="Knowledge">
-                    <KnowledgeView data={data.knowledge} />
+                    {(() => {
+                      console.log(`🎯 Rendering KnowledgeView with data:`, data.knowledge);
+                      console.log(`📊 Knowledge data exists: ${!!data.knowledge}`);
+                      if (data.knowledge) {
+                        console.log(`📋 Knowledge data structure:`, Object.keys(data.knowledge));
+                        console.log(`📈 Knowledge stats:`, data.knowledge.stats);
+                      }
+                      return <KnowledgeView data={data.knowledge} />;
+                    })()}
                   </ErrorBoundary>
                 )}
                 {state.currentView === 'memory' && (
                   <ErrorBoundary variant="view" name="Memory">
-                    <MemoryView data={data.memory} />
+                    {(() => {
+                      console.log(`🎯 Rendering MemoryView with data:`, data.memory);
+                      console.log(`📊 Memory data exists: ${!!data.memory}`);
+                      if (data.memory) {
+                        console.log(`📋 Memory data structure:`, Object.keys(data.memory));
+                        console.log(`📈 Memory stats:`, data.memory.stats);
+                      }
+                      return <MemoryView data={data.memory} />;
+                    })()}
                   </ErrorBoundary>
                 )}
                 {state.currentView === 'tasks' && (
