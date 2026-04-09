@@ -15,7 +15,7 @@ export interface Reminder {
 }
 
 class RemindersSystemService {
-  private memoryPath = '/home/openclaw/.openclaw/workspace/memory';
+  private memoryPath = '/home/openclaw/.openclaw/workspace/phil-brain/memory/daily';
   
   async getReminders(): Promise<Reminder[]> {
     try {

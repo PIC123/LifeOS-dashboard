@@ -26,6 +26,7 @@ export type DashboardView = 'projects' | 'knowledge' | 'memory' | 'tasks';
 interface DashboardState {
   currentView: DashboardView;
   sidebarCollapsed: boolean;
+  mobileMenuOpen: boolean;
 }
 
 interface DashboardData {
@@ -39,6 +40,7 @@ export default function PersonalCommandCenter() {
   const [state, setState] = useState<DashboardState>({
     currentView: 'knowledge',
     sidebarCollapsed: false,
+    mobileMenuOpen: false,
   });
   
   console.log(`🎭 Component state initialized:`, state);
@@ -160,17 +162,28 @@ export default function PersonalCommandCenter() {
     }
   }, [state.currentView]);
 
-  const handleViewChange = (view: DashboardView) => {
-    console.log(`🔄 View change requested: ${state.currentView} → ${view}`);
-    setState(prev => {
-      const newState = { ...prev, currentView: view };
-      console.log(`🎯 New state after view change:`, newState);
-      return newState;
-    });
-  };
+
 
   const toggleSidebar = () => {
     setState(prev => ({ ...prev, sidebarCollapsed: !prev.sidebarCollapsed }));
+  };
+
+  const toggleMobileMenu = () => {
+    setState(prev => ({ ...prev, mobileMenuOpen: !prev.mobileMenuOpen }));
+  };
+
+  const closeMobileMenu = () => {
+    setState(prev => ({ ...prev, mobileMenuOpen: false }));
+  };
+
+  // Close mobile menu when view changes
+  const handleViewChange = (view: DashboardView) => {
+    console.log(`🔄 View change requested: ${state.currentView} → ${view}`);
+    setState(prev => {
+      const newState = { ...prev, currentView: view, mobileMenuOpen: false };
+      console.log(`🎯 New state after view change:`, newState);
+      return newState;
+    });
   };
 
   // Calculate stats for sidebar
@@ -205,7 +218,7 @@ export default function PersonalCommandCenter() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white font-mono">
+    <div className="min-h-screen bg-black text-white font-mono overflow-x-hidden">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -223,23 +236,40 @@ export default function PersonalCommandCenter() {
         currentView={state.currentView}
         onViewChange={handleViewChange}
         onSidebarToggle={toggleSidebar}
+        onMobileMenuToggle={toggleMobileMenu}
         sidebarCollapsed={state.sidebarCollapsed}
+        mobileMenuOpen={state.mobileMenuOpen}
       />
 
-      <div className="flex">
+      <div className="flex relative">
+        {/* Mobile Backdrop */}
+        {state.mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+            onClick={closeMobileMenu}
+          />
+        )}
+
         {/* Sidebar */}
         <DashboardSidebar
           collapsed={state.sidebarCollapsed}
+          mobileOpen={state.mobileMenuOpen}
           currentView={state.currentView}
           onViewChange={handleViewChange}
+          onClose={closeMobileMenu}
           stats={sidebarStats}
         />
 
         {/* Main Content */}
-        <main className={`flex-1 transition-all duration-300 ${
-          state.sidebarCollapsed ? 'ml-16' : 'ml-64'
-        }`}>
-          <div className="p-6">
+        <main className={`flex-1 transition-all duration-300 
+          md:${state.sidebarCollapsed ? 'ml-16' : 'ml-64'}
+          ${state.mobileMenuOpen ? 'pointer-events-none md:pointer-events-auto' : ''}
+        `}>
+          <div className="p-4 md:p-6">
             {/* Stats Overview */}
             <ErrorBoundary variant="view" name="Stats">
               <DashboardStats

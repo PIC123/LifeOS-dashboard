@@ -64,13 +64,13 @@ export default function KnowledgeView({ data }: KnowledgeViewProps) {
   return (
     <div className="space-y-6">
       {/* Knowledge System Header */}
-      <div className="bg-zinc-900 rounded-lg border border-cyan-400/20 p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-zinc-900 rounded-lg border border-cyan-400/20 p-4 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 space-y-4 md:space-y-0">
           <div className="flex items-center space-x-3">
-            <Brain className="h-8 w-8 text-cyan-400" />
+            <Brain className="h-6 w-6 md:h-8 md:w-8 text-cyan-400" />
             <div>
-              <h2 className="text-2xl font-bold text-white">Zettelkasten System</h2>
-              <p className="text-zinc-400">Your connected knowledge network</p>
+              <h2 className="text-xl md:text-2xl font-bold text-white">Zettelkasten System</h2>
+              <p className="text-sm md:text-base text-zinc-400 hidden sm:block">Your connected knowledge network</p>
             </div>
           </div>
           
@@ -82,13 +82,13 @@ export default function KnowledgeView({ data }: KnowledgeViewProps) {
               placeholder="Search knowledge..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white placeholder-zinc-400 focus:border-cyan-400 focus:outline-none w-64"
+              className="pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white placeholder-zinc-400 focus:border-cyan-400 focus:outline-none w-full md:w-64 touch-manipulation"
             />
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
           <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
             <div className="flex items-center justify-between">
               <span className="text-zinc-400">Atomic Notes</span>
@@ -117,7 +117,7 @@ export default function KnowledgeView({ data }: KnowledgeViewProps) {
 
       {/* Tabs */}
       <div className="border-b border-zinc-700">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide">
           {[
             { id: 'notes', label: 'Recent Notes', icon: FileText },
             { id: 'maps', label: 'Knowledge Maps', icon: Link },
@@ -126,10 +126,10 @@ export default function KnowledgeView({ data }: KnowledgeViewProps) {
             <button
               key={id}
               onClick={() => setActiveTab(id as any)}
-              className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`group inline-flex items-center py-3 md:py-4 px-2 md:px-1 border-b-2 font-medium text-sm whitespace-nowrap touch-manipulation min-h-[44px] ${
                 activeTab === id
                   ? 'border-cyan-400 text-cyan-400'
-                  : 'border-transparent text-zinc-400 hover:text-white hover:border-zinc-300'
+                  : 'border-transparent text-zinc-400 hover:text-white hover:border-zinc-300 active:border-zinc-400'
               }`}
             >
               <Icon className={`mr-2 h-5 w-5 ${

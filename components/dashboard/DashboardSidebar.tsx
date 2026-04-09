@@ -14,7 +14,9 @@ export type DashboardView = 'projects' | 'knowledge' | 'memory' | 'tasks';
 interface DashboardSidebarProps {
   currentView: DashboardView;
   collapsed: boolean;
+  mobileOpen: boolean;
   onViewChange: (view: DashboardView) => void;
+  onClose: () => void;
   stats: {
     activeProjects: number;
     totalTasks: number;
@@ -53,15 +55,19 @@ const navigationItems = [
 export default function DashboardSidebar({
   currentView,
   collapsed,
+  mobileOpen,
   onViewChange,
+  onClose,
   stats
 }: DashboardSidebarProps) {
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: collapsed ? 64 : 256 }}
-      className="bg-zinc-900 border-r border-zinc-800 h-full flex flex-col"
-    >
+    <>
+      {/* Desktop Sidebar */}
+      <motion.aside
+        initial={false}
+        animate={{ width: collapsed ? 64 : 256 }}
+        className="hidden md:flex bg-zinc-900 border-r border-zinc-800 h-full flex-col"
+      >
       {/* Header */}
       <div className="p-4 border-b border-zinc-800">
         <AnimatePresence mode="wait">
@@ -110,7 +116,7 @@ export default function DashboardSidebar({
               <button
                 key={item.id}
                 onClick={() => onViewChange(item.id)}
-                className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium transition-all ${
+                className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium transition-all touch-manipulation ${
                   isActive
                     ? 'bg-zinc-800 text-white border border-zinc-700'
                     : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
@@ -204,5 +210,113 @@ export default function DashboardSidebar({
         </AnimatePresence>
       </div>
     </motion.aside>
+
+      {/* Mobile Drawer */}
+      <AnimatePresence mode="wait">
+        {mobileOpen && (
+          <motion.aside
+            initial={{ x: -256 }}
+            animate={{ x: 0 }}
+            exit={{ x: -256 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+            className="md:hidden fixed top-0 left-0 w-64 h-full bg-zinc-900 border-r border-zinc-800 z-50 flex flex-col shadow-2xl"
+          >
+            {/* Mobile Header */}
+            <div className="p-4 border-b border-zinc-800">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
+                    <div className="w-3 h-3 bg-black rounded-full"></div>
+                  </div>
+                  <div>
+                    <div className="font-mono text-sm font-bold text-white tracking-wider">
+                      COMMAND CENTER
+                    </div>
+                    <div className="text-xs text-zinc-400 font-mono">
+                      Personal Dashboard
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition-colors"
+                  aria-label="Close menu"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Navigation */}
+            <nav className="flex-1 p-4">
+              <div className="space-y-2">
+                {navigationItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = currentView === item.id;
+                  
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => onViewChange(item.id)}
+                      className={`w-full flex items-center space-x-3 px-4 py-4 rounded-lg font-medium transition-all touch-manipulation ${
+                        isActive
+                          ? 'bg-zinc-800 text-white border border-zinc-700'
+                          : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50 active:bg-zinc-800'
+                      }`}
+                    >
+                      <Icon className={`h-6 w-6 ${isActive ? item.color : ''}`} />
+                      <span className="text-base">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </nav>
+
+            {/* Mobile Stats */}
+            <div className="p-4 border-t border-zinc-800">
+              <div className="flex items-center space-x-2 mb-4">
+                <BarChart3 className="w-4 h-4 text-cyan-400" />
+                <span className="font-mono text-sm text-zinc-400 tracking-wider">
+                  OVERVIEW
+                </span>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-zinc-400">Active Projects</span>
+                  <span className="font-mono text-cyan-400">{stats.activeProjects}</span>
+                </div>
+                
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-zinc-400">Total Tasks</span>
+                  <span className="font-mono text-orange-400">{stats.totalTasks}</span>
+                </div>
+                
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-zinc-400">Knowledge Notes</span>
+                  <span className="font-mono text-purple-400">{stats.recentNotes}</span>
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-zinc-400">Memory Days</span>
+                  <span className="font-mono text-green-400">{stats.memoryDays}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Footer */}
+            <div className="p-4 border-t border-zinc-800">
+              <div className="flex items-center space-x-2 text-sm text-zinc-500">
+                <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span>System Online</span>
+              </div>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </>
+  );
   );
 }
